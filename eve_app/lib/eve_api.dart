@@ -415,4 +415,77 @@ class EveApi {
     );
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
+
+  Future<Map<String, dynamic>> studentPeerNotes(String userId) async {
+    final response = await _request(
+      (baseUrl) => http.get(
+        Uri.parse('$baseUrl/api/student/$userId/peer-notes'),
+        headers: browserTunnelHeaders,
+      ),
+    );
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> submitPeerNote({
+    required String userId,
+    required String courseCode,
+    required String title,
+    required String summary,
+    required String content,
+  }) async {
+    final response = await _request(
+      (baseUrl) => http.post(
+        Uri.parse('$baseUrl/api/student/peer-notes'),
+        headers: jsonHeaders,
+        body: jsonEncode({
+          'user_id': userId,
+          'course_code': courseCode,
+          'title': title,
+          'summary': summary,
+          'content': content,
+        }),
+      ),
+    );
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> peerNoteReviewQueue({
+    required EveRole actorRole,
+    required String actorUserId,
+  }) async {
+    final response = await _request(
+      (baseUrl) => http.get(
+        Uri.parse('$baseUrl/api/admin/peer-notes').replace(
+          queryParameters: {
+            'actor_role': actorRole.value,
+            'actor_user_id': actorUserId,
+          },
+        ),
+        headers: browserTunnelHeaders,
+      ),
+    );
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> reviewPeerNote({
+    required String noteId,
+    required EveRole actorRole,
+    required String actorUserId,
+    required String status,
+    String reviewNotes = '',
+  }) async {
+    final response = await _request(
+      (baseUrl) => http.patch(
+        Uri.parse('$baseUrl/api/admin/peer-notes/$noteId'),
+        headers: jsonHeaders,
+        body: jsonEncode({
+          'actor_role': actorRole.value,
+          'actor_user_id': actorUserId,
+          'status': status,
+          'review_notes': reviewNotes,
+        }),
+      ),
+    );
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
 }

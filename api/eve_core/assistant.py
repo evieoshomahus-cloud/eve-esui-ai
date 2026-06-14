@@ -71,6 +71,10 @@ def _sources(hits: list[RetrievalHit]) -> list[Source]:
     def source_label(item: dict[str, Any]) -> str:
         if item.get("category") == "official_web":
             return "Live ESUI Website"
+        if item.get("source_type") == "reviewed_peer_note" or "peer note" in [
+            str(tag).lower() for tag in item.get("tags", [])
+        ]:
+            return "Reviewed Peer Learning Note"
         tags = [str(tag).lower() for tag in item.get("tags", [])]
         if "demo" in tags or str(item.get("title", "")).lower().startswith("demo"):
             return "Demo Curated Knowledge"

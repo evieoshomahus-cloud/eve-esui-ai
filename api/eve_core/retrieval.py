@@ -6,6 +6,7 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Iterable
 
+from .peer_notes import approved_peer_note_items
 from .repository import knowledge_items
 
 
@@ -61,7 +62,7 @@ def retrieve(message: str, role: str, limit: int = 5) -> list[RetrievalHit]:
         & set(query_tokens)
     )
     hits: list[RetrievalHit] = []
-    for item in knowledge_items():
+    for item in [*knowledge_items(), *approved_peer_note_items()]:
         if not set(item["audience"]) & allowed_audiences(role):
             continue
         if item.get("category") == "security" and not security_query:

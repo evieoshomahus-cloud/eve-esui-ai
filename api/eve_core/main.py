@@ -17,6 +17,13 @@ from .learning import learning_profile
 from .learning_sessions import get_learning_session, start_learning_session, submit_learning_answer
 from .local_env import load_local_env
 from .llm import openai_configured
+from .peer_notes import (
+    PeerNoteError,
+    peer_note_review_queue,
+    student_peer_notes,
+    submit_peer_note,
+    update_peer_note_review,
+)
 from .progress_store import lecturer_course_learning_insights, student_progress_history
 from .repository import (
     KnowledgeNotFoundError,
@@ -49,6 +56,8 @@ from .schemas import (
     LearningAnswerRequest,
     LearningSessionStartRequest,
     KnowledgeValidateRequest,
+    PeerNoteCreateRequest,
+    PeerNoteReviewRequest,
 )
 from .knowledge_validation import validate_knowledge_entries
 
@@ -112,6 +121,50 @@ def uploaded_attachments(role: str, user_id: str) -> list[dict]:
     if profile is None or profile.get("role") != role:
         raise HTTPException(status_code=403, detail="Upload user does not match a valid demo account.")
     return list_attachments(role, user_id)
+
+
+@app.post("/api/student/peer-notes")
+def create_student_peer_note(payload: PeerNoteCreateRequest) -> dict:
+    try:
+        return submit_peer_note(
+            user_id=payload.user_id,
+            course_code=payload.course_code,
+            title=payload.title,
+            summary=payload.summary,
+            content=payload.content,
+        )
+    except PeerNoteError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/student/{user_id}/peer-notes")
+def list_student_peer_notes(user_id: str) -> dict:
+    try:
+        return student_peer_notes(user_id)
+    except PeerNoteError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/api/admin/peer-notes")
+def list_peer_note_review_queue(actor_role: str, actor_user_id: str) -> dict:
+    try:
+        return peer_note_review_queue(actor_role, actor_user_id)
+    except PeerNoteError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+
+@app.patch("/api/admin/peer-notes/{note_id}")
+def review_peer_note(note_id: str, payload: PeerNoteReviewRequest) -> dict:
+    try:
+        return update_peer_note_review(
+            note_id=note_id,
+            actor_role=payload.actor_role,
+            actor_user_id=payload.actor_user_id,
+            status=payload.status,
+            review_notes=payload.review_notes or "",
+        )
+    except PeerNoteError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
 
 
 @app.get("/api/admin/knowledge/stats")

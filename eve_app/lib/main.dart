@@ -655,6 +655,8 @@ class _EveShellState extends State<EveShell> {
           onStartLearningSession: _startLearningSession,
           onOpenAdmission: () => setState(() => _pageIndex = 3),
           onOpenKnowledgeAdmin: () => setState(() => _pageIndex = 6),
+          onOpenPeerNotes: () => setState(() => _pageIndex = 7),
+          onOpenPeerReview: () => setState(() => _pageIndex = 8),
         );
       case 3:
         return AdmissionPage(
@@ -679,6 +681,7 @@ class _EveShellState extends State<EveShell> {
           user: _selectedUser,
           online: _apiOnline,
           onSwitch: _showAccountSheet,
+          onLogout: _logout,
           onAskSecurity: () => _askEve('How does Eve protect student privacy?'),
         );
       case 5:
@@ -692,6 +695,19 @@ class _EveShellState extends State<EveShell> {
         );
       case 6:
         return KnowledgeAdminPage(
+          api: _api,
+          user: _selectedUser,
+          role: _role,
+          onBack: () => setState(() => _pageIndex = 2),
+        );
+      case 7:
+        return StudentPeerNotesPage(
+          api: _api,
+          user: _selectedUser,
+          onBack: () => setState(() => _pageIndex = 2),
+        );
+      case 8:
+        return PeerNoteReviewPage(
           api: _api,
           user: _selectedUser,
           role: _role,
@@ -1846,6 +1862,8 @@ class ToolsPage extends StatelessWidget {
     required this.onStartLearningSession,
     required this.onOpenAdmission,
     required this.onOpenKnowledgeAdmin,
+    required this.onOpenPeerNotes,
+    required this.onOpenPeerReview,
     super.key,
   });
 
@@ -1856,6 +1874,8 @@ class ToolsPage extends StatelessWidget {
   final void Function(String courseCode, String? topic) onStartLearningSession;
   final VoidCallback onOpenAdmission;
   final VoidCallback onOpenKnowledgeAdmin;
+  final VoidCallback onOpenPeerNotes;
+  final VoidCallback onOpenPeerReview;
 
   @override
   Widget build(BuildContext context) {
@@ -1865,6 +1885,7 @@ class ToolsPage extends StatelessWidget {
         user: user,
         onPrompt: onPrompt,
         onStartLearningSession: onStartLearningSession,
+        onOpenPeerNotes: onOpenPeerNotes,
       );
     }
     if (role == EveRole.lecturer) {
@@ -1873,6 +1894,7 @@ class ToolsPage extends StatelessWidget {
         user: user,
         onPrompt: onPrompt,
         onOpenKnowledgeAdmin: onOpenKnowledgeAdmin,
+        onOpenPeerReview: onOpenPeerReview,
       );
     }
     if (role == EveRole.admin) {
@@ -1880,6 +1902,7 @@ class ToolsPage extends StatelessWidget {
         user: user,
         onPrompt: onPrompt,
         onOpenKnowledgeAdmin: onOpenKnowledgeAdmin,
+        onOpenPeerReview: onOpenPeerReview,
       );
     }
     return GuestTools(onPrompt: onPrompt, onOpenAdmission: onOpenAdmission);
@@ -1968,6 +1991,7 @@ class StudentTools extends StatelessWidget {
     required this.user,
     required this.onPrompt,
     required this.onStartLearningSession,
+    required this.onOpenPeerNotes,
     super.key,
   });
 
@@ -1975,6 +1999,7 @@ class StudentTools extends StatelessWidget {
   final EveUser user;
   final ValueChanged<String> onPrompt;
   final void Function(String courseCode, String? topic) onStartLearningSession;
+  final VoidCallback onOpenPeerNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -2072,6 +2097,26 @@ class StudentTools extends StatelessWidget {
                 subtitle: 'Your input stays personal',
                 body:
                     'Practice answers, weak topics, and learning-session scores are saved to this student dashboard for progress tracking. They do not publish school-wide knowledge. Official school information is managed separately through admin-reviewed knowledge entries.',
+              ),
+              const SizedBox(height: 18),
+              ResponsiveWrap(
+                children: [
+                  ActionTile(
+                    icon: Icons.library_books,
+                    title: 'Peer Notes',
+                    subtitle:
+                        'Submit how you understand a course for lecturer/admin review',
+                    accent: AppColors.green,
+                    onTap: onOpenPeerNotes,
+                  ),
+                  const InfoCard(
+                    icon: Icons.verified_user,
+                    title: 'Moderated sharing',
+                    subtitle: 'Not published immediately',
+                    body:
+                        'Student notes stay pending until a reviewer approves them. Approved notes can help classmates study, but they are labeled as peer learning support, not official school policy.',
+                  ),
+                ],
               ),
               const SizedBox(height: 18),
               SectionTitle(title: 'Recent learning history', trailing: 'Saved'),
@@ -2589,12 +2634,14 @@ class AdminTools extends StatelessWidget {
     required this.user,
     required this.onPrompt,
     required this.onOpenKnowledgeAdmin,
+    required this.onOpenPeerReview,
     super.key,
   });
 
   final EveUser user;
   final ValueChanged<String> onPrompt;
   final VoidCallback onOpenKnowledgeAdmin;
+  final VoidCallback onOpenPeerReview;
 
   @override
   Widget build(BuildContext context) {
@@ -2628,6 +2675,13 @@ class AdminTools extends StatelessWidget {
                 onTap: () => onPrompt(
                   'Audit Eve payment guidance and official ESUI links.',
                 ),
+              ),
+              ActionTile(
+                icon: Icons.rate_review,
+                title: 'Peer note review',
+                subtitle: 'Approve or return student learning notes',
+                accent: AppColors.green,
+                onTap: onOpenPeerReview,
               ),
             ],
           ),
@@ -2675,6 +2729,7 @@ class LecturerTools extends StatelessWidget {
     required this.user,
     required this.onPrompt,
     required this.onOpenKnowledgeAdmin,
+    required this.onOpenPeerReview,
     super.key,
   });
 
@@ -2682,6 +2737,7 @@ class LecturerTools extends StatelessWidget {
   final EveUser user;
   final ValueChanged<String> onPrompt;
   final VoidCallback onOpenKnowledgeAdmin;
+  final VoidCallback onOpenPeerReview;
 
   @override
   Widget build(BuildContext context) {
@@ -2754,6 +2810,13 @@ class LecturerTools extends StatelessWidget {
                     subtitle: 'Assigned-course entries only',
                     accent: AppColors.gold,
                     onTap: onOpenKnowledgeAdmin,
+                  ),
+                  ActionTile(
+                    icon: Icons.rate_review,
+                    title: 'Peer notes',
+                    subtitle: 'Review student notes for your courses',
+                    accent: AppColors.green,
+                    onTap: onOpenPeerReview,
                   ),
                   InfoCard(
                     icon: Icons.policy,
@@ -5137,11 +5200,638 @@ class EstimatePanel extends StatelessWidget {
   }
 }
 
+class StudentPeerNotesPage extends StatefulWidget {
+  const StudentPeerNotesPage({
+    required this.api,
+    required this.user,
+    required this.onBack,
+    super.key,
+  });
+
+  final EveApi api;
+  final EveUser user;
+  final VoidCallback onBack;
+
+  @override
+  State<StudentPeerNotesPage> createState() => _StudentPeerNotesPageState();
+}
+
+class _StudentPeerNotesPageState extends State<StudentPeerNotesPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _summaryController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
+
+  bool _loading = true;
+  bool _submitting = false;
+  String? _courseCode;
+  String? _error;
+  String? _message;
+  List<Map<String, dynamic>> _courses = const [];
+  List<Map<String, dynamic>> _ownNotes = const [];
+  List<Map<String, dynamic>> _approvedNotes = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _summaryController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final results = await Future.wait<Map<String, dynamic>>([
+        widget.api.learningProfile(widget.user.userId),
+        widget.api.studentPeerNotes(widget.user.userId),
+      ]);
+      final profilePayload = results[0];
+      final notesPayload = results[1];
+      final profile =
+          (profilePayload['profile'] as Map<String, dynamic>?) ?? const {};
+      final courses = ((profile['courses'] as List<dynamic>?) ?? const [])
+          .map((item) => item as Map<String, dynamic>)
+          .toList();
+      if (!mounted) return;
+      setState(() {
+        _courses = courses;
+        _courseCode ??= courses.isNotEmpty
+            ? '${courses.first['course_code']}'
+            : null;
+        _ownNotes = ((notesPayload['own_notes'] as List<dynamic>?) ?? const [])
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+        _approvedNotes =
+            ((notesPayload['approved_peer_notes'] as List<dynamic>?) ??
+                    const [])
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = error.toString();
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate() || _courseCode == null) return;
+    setState(() {
+      _submitting = true;
+      _error = null;
+      _message = null;
+    });
+    try {
+      await widget.api.submitPeerNote(
+        userId: widget.user.userId,
+        courseCode: _courseCode!,
+        title: _titleController.text.trim(),
+        summary: _summaryController.text.trim(),
+        content: _contentController.text.trim(),
+      );
+      _titleController.clear();
+      _summaryController.clear();
+      _contentController.clear();
+      await _load();
+      if (!mounted) return;
+      setState(() {
+        _message =
+            'Submitted for review. A lecturer/admin must approve it before classmates can use it.';
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString());
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  String? _minLength(String? value, int length, String label) {
+    if ((value ?? '').trim().length < length) {
+      return '$label should be at least $length characters.';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return PageShell(
+      title: 'Peer Notes',
+      subtitle: 'Share useful course explanations after review',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              OutlinedButton.icon(
+                onPressed: widget.onBack,
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('Tools'),
+              ),
+              OutlinedButton.icon(
+                onPressed: _load,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Refresh'),
+              ),
+            ],
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            InfoCard(
+              icon: Icons.error_outline,
+              title: 'Peer notes unavailable',
+              subtitle: 'Try again',
+              body: _error!,
+            ),
+          ],
+          if (_message != null) ...[
+            const SizedBox(height: 12),
+            InfoCard(
+              icon: Icons.check_circle_outline,
+              title: 'Contribution received',
+              subtitle: 'Pending review',
+              body: _message!,
+            ),
+          ],
+          const SizedBox(height: 18),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SectionTitle(
+                      title: 'Submit a course note',
+                      trailing: 'Review required',
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: _courseCode,
+                      decoration: const InputDecoration(
+                        labelText: 'Registered course',
+                      ),
+                      items: _courses
+                          .map(
+                            (course) => DropdownMenuItem<String>(
+                              value: '${course['course_code']}',
+                              child: Text(
+                                '${course['course_code']} - ${course['title']}',
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) => setState(() => _courseCode = value),
+                      validator: (value) =>
+                          value == null ? 'Choose a course.' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Note title',
+                        hintText: 'Example: Understanding normalization',
+                      ),
+                      validator: (value) => _minLength(value, 4, 'The title'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _summaryController,
+                      decoration: const InputDecoration(
+                        labelText: 'Short summary',
+                        hintText:
+                            'What should another student understand after reading this?',
+                      ),
+                      minLines: 2,
+                      maxLines: 4,
+                      validator: (value) =>
+                          _minLength(value, 20, 'The summary'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _contentController,
+                      decoration: const InputDecoration(
+                        labelText: 'Your explanation',
+                        hintText:
+                            'Write your explanation, example, formula, steps, or common mistakes here.',
+                      ),
+                      minLines: 8,
+                      maxLines: 14,
+                      validator: (value) =>
+                          _minLength(value, 80, 'The explanation'),
+                    ),
+                    const SizedBox(height: 14),
+                    FilledButton.icon(
+                      onPressed: _submitting ? null : _submit,
+                      icon: _submitting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.send),
+                      label: Text(_submitting ? 'Submitting' : 'Submit note'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          SectionTitle(
+            title: 'My contributions',
+            trailing: '${_ownNotes.length}',
+          ),
+          const SizedBox(height: 10),
+          if (_ownNotes.isEmpty)
+            const InfoCard(
+              icon: Icons.note_add,
+              title: 'No peer notes yet',
+              subtitle: 'Start with one course',
+              body:
+                  'Your submitted notes will appear here with pending, approved, rejected, or needs revision status.',
+            )
+          else
+            ResponsiveWrap(
+              children: _ownNotes
+                  .map((note) => PeerNoteCard(note: note))
+                  .toList(),
+            ),
+          const SizedBox(height: 18),
+          SectionTitle(
+            title: 'Approved notes from classmates',
+            trailing: '${_approvedNotes.length}',
+          ),
+          const SizedBox(height: 10),
+          if (_approvedNotes.isEmpty)
+            const InfoCard(
+              icon: Icons.groups,
+              title: 'No approved peer notes yet',
+              subtitle: 'Reviewer controlled',
+              body:
+                  'When a lecturer or admin approves student notes for your registered courses, they will appear here as study support.',
+            )
+          else
+            ResponsiveWrap(
+              children: _approvedNotes
+                  .map((note) => PeerNoteCard(note: note))
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class PeerNoteReviewPage extends StatefulWidget {
+  const PeerNoteReviewPage({
+    required this.api,
+    required this.user,
+    required this.role,
+    required this.onBack,
+    super.key,
+  });
+
+  final EveApi api;
+  final EveUser user;
+  final EveRole role;
+  final VoidCallback onBack;
+
+  @override
+  State<PeerNoteReviewPage> createState() => _PeerNoteReviewPageState();
+}
+
+class _PeerNoteReviewPageState extends State<PeerNoteReviewPage> {
+  bool _loading = true;
+  String? _busyNoteId;
+  String? _error;
+  String? _message;
+  List<Map<String, dynamic>> _notes = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final payload = await widget.api.peerNoteReviewQueue(
+        actorRole: widget.role,
+        actorUserId: widget.user.userId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _notes = ((payload['notes'] as List<dynamic>?) ?? const [])
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = error.toString();
+      });
+    }
+  }
+
+  Future<String?> _reviewNotesDialog(String status) {
+    final controller = TextEditingController(
+      text: status == 'approved'
+          ? 'Approved for peer learning support in this demo.'
+          : '',
+    );
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Mark as ${status.replaceAll('_', ' ')}'),
+        content: TextField(
+          controller: controller,
+          minLines: 3,
+          maxLines: 5,
+          decoration: const InputDecoration(
+            labelText: 'Review note',
+            hintText: 'Tell the student what changed or why it was approved.',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text('Save review'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _review(Map<String, dynamic> note, String status) async {
+    final noteId = '${note['id'] ?? ''}';
+    if (noteId.isEmpty) return;
+    final reviewNotes = await _reviewNotesDialog(status);
+    if (reviewNotes == null) return;
+    setState(() {
+      _busyNoteId = noteId;
+      _error = null;
+      _message = null;
+    });
+    try {
+      await widget.api.reviewPeerNote(
+        noteId: noteId,
+        actorRole: widget.role,
+        actorUserId: widget.user.userId,
+        status: status,
+        reviewNotes: reviewNotes,
+      );
+      await _load();
+      if (!mounted) return;
+      setState(() {
+        _message = 'Peer note marked as ${status.replaceAll('_', ' ')}.';
+        _busyNoteId = null;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _busyNoteId = null;
+        _error = error.toString();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final pending = _notes
+        .where((note) => note['status'] == 'pending')
+        .toList();
+    return PageShell(
+      title: 'Peer Note Review',
+      subtitle: widget.role == EveRole.lecturer
+          ? 'Assigned-course student contributions'
+          : 'School-wide student contribution queue',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              OutlinedButton.icon(
+                onPressed: widget.onBack,
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('Tools'),
+              ),
+              OutlinedButton.icon(
+                onPressed: _load,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Refresh'),
+              ),
+            ],
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            InfoCard(
+              icon: Icons.error_outline,
+              title: 'Review queue unavailable',
+              subtitle: 'Try again',
+              body: _error!,
+            ),
+          ],
+          if (_message != null) ...[
+            const SizedBox(height: 12),
+            InfoCard(
+              icon: Icons.check_circle_outline,
+              title: 'Review saved',
+              subtitle: 'Queue updated',
+              body: _message!,
+            ),
+          ],
+          const SizedBox(height: 18),
+          SectionTitle(title: 'Pending review', trailing: '${pending.length}'),
+          const SizedBox(height: 10),
+          if (_notes.isEmpty)
+            const InfoCard(
+              icon: Icons.rate_review,
+              title: 'No peer notes available',
+              subtitle: 'Nothing to review',
+              body:
+                  'Student submissions will appear here when they match your review scope.',
+            )
+          else
+            ResponsiveWrap(
+              children: _notes
+                  .map(
+                    (note) => PeerNoteCard(
+                      note: note,
+                      actions: [
+                        OutlinedButton.icon(
+                          onPressed: _busyNoteId == note['id']
+                              ? null
+                              : () => _review(note, 'needs_revision'),
+                          icon: const Icon(Icons.edit_note),
+                          label: const Text('Revise'),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _busyNoteId == note['id']
+                              ? null
+                              : () => _review(note, 'rejected'),
+                          icon: const Icon(Icons.close),
+                          label: const Text('Reject'),
+                        ),
+                        FilledButton.icon(
+                          onPressed: _busyNoteId == note['id']
+                              ? null
+                              : () => _review(note, 'approved'),
+                          icon: const Icon(Icons.verified),
+                          label: const Text('Approve'),
+                        ),
+                      ],
+                    ),
+                  )
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class PeerNoteCard extends StatelessWidget {
+  const PeerNoteCard({required this.note, this.actions = const [], super.key});
+
+  final Map<String, dynamic> note;
+  final List<Widget> actions;
+
+  Color _statusColor(String status) {
+    return switch (status) {
+      'approved' => AppColors.green,
+      'rejected' => const Color(0xFFB73535),
+      'needs_revision' => AppColors.gold,
+      _ => AppColors.blue,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = '${note['status'] ?? 'pending'}';
+    final color = _statusColor(status);
+    final content = '${note['content'] ?? ''}';
+    final preview = content.length > 320
+        ? '${content.substring(0, 320)}...'
+        : content;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                IconBadge(icon: Icons.library_books, color: color, small: true),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${note['course_code']} - ${note['title']}',
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      Text(
+                        'By ${note['student_name'] ?? 'Student'}',
+                        style: const TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    status.replaceAll('_', ' '),
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '${note['summary'] ?? ''}',
+              style: const TextStyle(height: 1.4),
+            ),
+            if (preview.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                preview,
+                style: const TextStyle(color: AppColors.muted, height: 1.4),
+              ),
+            ],
+            if ('${note['review_notes'] ?? ''}'.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                'Review note: ${note['review_notes']}',
+                style: const TextStyle(height: 1.4),
+              ),
+            ],
+            if (actions.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(spacing: 8, runSpacing: 8, children: actions),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({
     required this.user,
     required this.online,
     required this.onSwitch,
+    required this.onLogout,
     required this.onAskSecurity,
     super.key,
   });
@@ -5149,6 +5839,7 @@ class ProfilePage extends StatelessWidget {
   final EveUser user;
   final bool online;
   final VoidCallback onSwitch;
+  final VoidCallback onLogout;
   final VoidCallback onAskSecurity;
 
   @override
@@ -5218,6 +5909,13 @@ class ProfilePage extends StatelessWidget {
                 subtitle: 'Ask how Eve protects records',
                 accent: AppColors.green,
                 onTap: onAskSecurity,
+              ),
+              ActionTile(
+                icon: Icons.logout,
+                title: 'Logout',
+                subtitle: 'Return to role selection',
+                accent: const Color(0xFFB73535),
+                onTap: onLogout,
               ),
             ],
           ),

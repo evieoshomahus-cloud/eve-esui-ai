@@ -39,6 +39,21 @@ class AttachmentResponse(BaseModel):
     preview: str = ""
 
 
+class PeerNoteCreateRequest(BaseModel):
+    user_id: str = Field(min_length=3, max_length=120)
+    course_code: str = Field(min_length=3, max_length=20)
+    title: str = Field(min_length=4, max_length=140)
+    summary: str = Field(min_length=20, max_length=500)
+    content: str = Field(min_length=80, max_length=6000)
+
+
+class PeerNoteReviewRequest(BaseModel):
+    actor_role: Literal["lecturer", "admin"]
+    actor_user_id: str = Field(min_length=3, max_length=120)
+    status: Literal["pending", "approved", "rejected", "needs_revision"]
+    review_notes: str | None = Field(default="", max_length=1000)
+
+
 class Source(BaseModel):
     title: str
     category: str
