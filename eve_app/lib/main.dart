@@ -767,11 +767,14 @@ class _EveShellState extends State<EveShell> {
         );
       default:
         return HomePage(
+          api: _api,
           user: _selectedUser,
           role: _role,
           online: _apiOnline,
           onPrompt: _askEve,
           onNavigate: _openPage,
+          onStartLearningSession: _startLearningSession,
+          onOpenPeerNotes: () => _openPage(7),
         );
     }
   }
@@ -962,19 +965,25 @@ class EntryCard extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   const HomePage({
+    required this.api,
     required this.user,
     required this.role,
     required this.online,
     required this.onPrompt,
     required this.onNavigate,
+    required this.onStartLearningSession,
+    required this.onOpenPeerNotes,
     super.key,
   });
 
+  final EveApi api;
   final EveUser user;
   final EveRole role;
   final bool online;
   final ValueChanged<String> onPrompt;
   final ValueChanged<int> onNavigate;
+  final void Function(String courseCode, String? topic) onStartLearningSession;
+  final VoidCallback onOpenPeerNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -991,28 +1000,39 @@ class HomePage extends StatelessWidget {
             onAsk: () => onNavigate(1),
           ),
           const SizedBox(height: 18),
-          Text(
-            'Today',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-          ),
-          const SizedBox(height: 10),
-          ResponsiveWrap(
-            children: actions
-                .map(
-                  (action) => ActionTile(
-                    icon: action.icon,
-                    title: action.title,
-                    subtitle: action.subtitle,
-                    accent: action.accent,
-                    onTap: action.prompt == null
-                        ? () => onNavigate(action.pageIndex ?? 1)
-                        : () => onPrompt(action.prompt!),
-                  ),
-                )
-                .toList(),
-          ),
+          if (role == EveRole.student)
+            StudentHomeDashboard(
+              api: api,
+              user: user,
+              onPrompt: onPrompt,
+              onNavigate: onNavigate,
+              onStartLearningSession: onStartLearningSession,
+              onOpenPeerNotes: onOpenPeerNotes,
+            )
+          else ...[
+            Text(
+              'Today',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 10),
+            ResponsiveWrap(
+              children: actions
+                  .map(
+                    (action) => ActionTile(
+                      icon: action.icon,
+                      title: action.title,
+                      subtitle: action.subtitle,
+                      accent: action.accent,
+                      onTap: action.prompt == null
+                          ? () => onNavigate(action.pageIndex ?? 1)
+                          : () => onPrompt(action.prompt!),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
           const SizedBox(height: 18),
           AskBar(onTap: () => onNavigate(1)),
         ],
@@ -1147,6 +1167,454 @@ class HomePage extends StatelessWidget {
           ),
         ];
     }
+  }
+}
+
+class StudentHomeDashboard extends StatefulWidget {
+  const StudentHomeDashboard({
+    required this.api,
+    required this.user,
+    required this.onPrompt,
+    required this.onNavigate,
+    required this.onStartLearningSession,
+    required this.onOpenPeerNotes,
+    super.key,
+  });
+
+  final EveApi api;
+  final EveUser user;
+  final ValueChanged<String> onPrompt;
+  final ValueChanged<int> onNavigate;
+  final void Function(String courseCode, String? topic) onStartLearningSession;
+  final VoidCallback onOpenPeerNotes;
+
+  @override
+  State<StudentHomeDashboard> createState() => _StudentHomeDashboardState();
+}
+
+class _StudentHomeDashboardState extends State<StudentHomeDashboard> {
+  late Future<_StudentHomeData> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  @override
+  void didUpdateWidget(StudentHomeDashboard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user.userId != widget.user.userId) {
+      _future = _load();
+    }
+  }
+
+  Future<_StudentHomeData> _load() async {
+    final results = await Future.wait<Map<String, dynamic>>([
+      widget.api.learningProfile(widget.user.userId),
+      widget.api.studentPeerNotes(widget.user.userId),
+    ]);
+    return _StudentHomeData(
+      learningPayload: results[0],
+      notesPayload: results[1],
+    );
+  }
+
+  void _refresh() {
+    setState(() => _future = _load());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_StudentHomeData>(
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const InfoCard(
+            icon: Icons.hourglass_empty,
+            title: 'Loading your dashboard',
+            subtitle: 'Personal progress',
+            body:
+                'Eve is gathering your progress, weak topics, learning history, and peer-note activity.',
+          );
+        }
+        if (snapshot.hasError) {
+          return InfoCard(
+            icon: Icons.error_outline,
+            title: 'Personal dashboard unavailable',
+            subtitle: 'Try again',
+            body: snapshot.error.toString(),
+            actionLabel: 'Refresh',
+            onTap: _refresh,
+          );
+        }
+        final data = snapshot.data!;
+        if (data.learningPayload['found'] != true) {
+          return const InfoCard(
+            icon: Icons.person_search,
+            title: 'No student profile',
+            subtitle: 'Demo account',
+            body:
+                'This student account does not have a linked learning profile.',
+          );
+        }
+        final profile = data.learningPayload['profile'] as Map<String, dynamic>;
+        final priority =
+            profile['priority_course'] as Map<String, dynamic>? ?? const {};
+        final progressHistory =
+            (profile['progress_history'] as Map<String, dynamic>?) ?? const {};
+        final weakTopics =
+            ((profile['weak_topics'] as List<dynamic>?) ?? const [])
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+        final recentSessions =
+            ((progressHistory['recent_sessions'] as List<dynamic>?) ?? const [])
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+        final ownNotes =
+            ((data.notesPayload['own_notes'] as List<dynamic>?) ?? const [])
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+        final approvedNotes =
+            ((data.notesPayload['approved_peer_notes'] as List<dynamic>?) ??
+                    const [])
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+        final pendingNotes = ownNotes
+            .where((note) => note['status'] == 'pending')
+            .length;
+        final approvedOwnNotes = ownNotes
+            .where((note) => note['status'] == 'approved')
+            .length;
+        final gaps = ((priority['topic_gaps'] as List<dynamic>?) ?? const [])
+            .cast<String>();
+        final priorityCourse = '${priority['course_code'] ?? ''}';
+        final priorityTopic = gaps.isNotEmpty ? gaps.first : null;
+        final latestSession = recentSessions.isNotEmpty
+            ? recentSessions.first
+            : null;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionTitle(
+              title: '${widget.user.name.split(' ').first}\'s dashboard',
+              trailing: 'Personalized',
+            ),
+            const SizedBox(height: 10),
+            StudentFocusCard(
+              priority: priority,
+              topic: priorityTopic,
+              onStart: priorityCourse.isEmpty
+                  ? null
+                  : () => widget.onStartLearningSession(
+                      priorityCourse,
+                      priorityTopic,
+                    ),
+              onOpenTools: () => widget.onNavigate(2),
+            ),
+            const SizedBox(height: 12),
+            ResponsiveWrap(
+              children: [
+                MetricCard(
+                  label: 'Overall progress',
+                  value: '${profile['overall_progress']}%',
+                  icon: Icons.show_chart,
+                ),
+                MetricCard(
+                  label: 'CGPA',
+                  value: '${profile['cgpa']}',
+                  icon: Icons.school,
+                ),
+                MetricCard(
+                  label: 'Weak topics',
+                  value: '${profile['weak_topic_count']}',
+                  icon: Icons.warning_amber,
+                ),
+                MetricCard(
+                  label: 'Quiz average',
+                  value: '${progressHistory['average_session_score'] ?? 0}%',
+                  icon: Icons.insights,
+                ),
+                MetricCard(
+                  label: 'Peer notes',
+                  value: '$approvedOwnNotes/${ownNotes.length}',
+                  icon: Icons.library_books,
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            SectionTitle(
+              title: 'Immediate actions',
+              trailing: 'Your next steps',
+            ),
+            const SizedBox(height: 10),
+            ResponsiveWrap(
+              children: [
+                ActionTile(
+                  icon: Icons.play_circle,
+                  title: 'Start recommended session',
+                  subtitle: priorityCourse.isEmpty
+                      ? 'Open learning tools'
+                      : priorityCourse,
+                  accent: AppColors.blue,
+                  onTap: priorityCourse.isEmpty
+                      ? () => widget.onNavigate(2)
+                      : () => widget.onStartLearningSession(
+                          priorityCourse,
+                          priorityTopic,
+                        ),
+                ),
+                ActionTile(
+                  icon: Icons.quiz,
+                  title: 'Generate practice',
+                  subtitle: priorityCourse.isEmpty
+                      ? 'Use your registered courses'
+                      : 'Mock test for $priorityCourse',
+                  accent: AppColors.green,
+                  onTap: () => widget.onPrompt(
+                    priorityCourse.isEmpty
+                        ? 'Generate a mock test for one of my registered courses.'
+                        : 'Generate a mock test for $priorityCourse${priorityTopic == null ? '' : ' focusing on $priorityTopic'}.',
+                  ),
+                ),
+                ActionTile(
+                  icon: Icons.library_books,
+                  title: 'Peer Notes',
+                  subtitle: pendingNotes > 0
+                      ? '$pendingNotes pending review'
+                      : '${approvedNotes.length} approved classmate notes',
+                  accent: AppColors.gold,
+                  onTap: widget.onOpenPeerNotes,
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            SectionTitle(title: 'Weak topic watchlist', trailing: 'Private'),
+            const SizedBox(height: 10),
+            if (weakTopics.isEmpty)
+              const InfoCard(
+                icon: Icons.check_circle_outline,
+                title: 'No urgent weak topic',
+                subtitle: 'Keep practising',
+                body:
+                    'Your current profile does not show an urgent topic gap. Keep using practice sessions to maintain momentum.',
+              )
+            else
+              ResponsiveWrap(
+                children: weakTopics
+                    .take(4)
+                    .map(
+                      (item) => WeakTopicCard(
+                        courseCode: '${item['course_code']}',
+                        topic: '${item['topic']}',
+                        onPractice: () => widget.onStartLearningSession(
+                          '${item['course_code']}',
+                          '${item['topic']}',
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            const SizedBox(height: 18),
+            SectionTitle(title: 'Recent progress', trailing: 'Saved sessions'),
+            const SizedBox(height: 10),
+            if (latestSession == null)
+              const InfoCard(
+                icon: Icons.history,
+                title: 'No saved session yet',
+                subtitle: 'Start today',
+                body:
+                    'After you complete an Eve learning session, your latest score and topic will appear here.',
+              )
+            else
+              StudentRecentSessionCard(session: latestSession),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _StudentHomeData {
+  const _StudentHomeData({
+    required this.learningPayload,
+    required this.notesPayload,
+  });
+
+  final Map<String, dynamic> learningPayload;
+  final Map<String, dynamic> notesPayload;
+}
+
+class StudentFocusCard extends StatelessWidget {
+  const StudentFocusCard({
+    required this.priority,
+    required this.topic,
+    required this.onOpenTools,
+    this.onStart,
+    super.key,
+  });
+
+  final Map<String, dynamic> priority;
+  final String? topic;
+  final VoidCallback? onStart;
+  final VoidCallback onOpenTools;
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = ((priority['progress'] as num?) ?? 0).toDouble();
+    final courseCode = '${priority['course_code'] ?? 'Course'}';
+    final title = '${priority['title'] ?? 'Recommended learning session'}';
+    final nextActivity =
+        '${priority['next_activity'] ?? 'Open your learning tools to continue.'}';
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const IconBadge(icon: Icons.flag, color: AppColors.blue),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Today\'s Focus',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                      ),
+                      Text(
+                        '$courseCode - $title',
+                        style: const TextStyle(color: AppColors.muted),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  '${progress.round()}%',
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            LinearProgressIndicator(
+              value: progress <= 0 ? null : progress / 100,
+              minHeight: 8,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            const SizedBox(height: 12),
+            Text(nextActivity, style: const TextStyle(height: 1.4)),
+            if (topic != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Weak topic: $topic',
+                style: const TextStyle(
+                  color: AppColors.muted,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                FilledButton.icon(
+                  onPressed: onStart,
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Start now'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: onOpenTools,
+                  icon: const Icon(Icons.apps),
+                  label: const Text('Open tools'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class WeakTopicCard extends StatelessWidget {
+  const WeakTopicCard({
+    required this.courseCode,
+    required this.topic,
+    required this.onPractice,
+    super.key,
+  });
+
+  final String courseCode;
+  final String topic;
+  final VoidCallback onPractice;
+
+  @override
+  Widget build(BuildContext context) {
+    return InfoCard(
+      icon: Icons.bolt,
+      title: courseCode,
+      subtitle: topic,
+      body:
+          'This topic is part of your private weak-topic profile. Practise it before moving to broader revision.',
+      actionLabel: 'Practise',
+      onTap: onPractice,
+    );
+  }
+}
+
+class StudentRecentSessionCard extends StatelessWidget {
+  const StudentRecentSessionCard({required this.session, super.key});
+
+  final Map<String, dynamic> session;
+
+  @override
+  Widget build(BuildContext context) {
+    final score = ((session['average_score'] as num?) ?? 0).round();
+    final color = score >= 70
+        ? AppColors.green
+        : score >= 50
+        ? AppColors.gold
+        : const Color(0xFFB73535);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            IconBadge(icon: Icons.history, color: color),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${session['course_code']} - ${session['topic']}',
+                    style: const TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${session['answered_count']}/${session['total_questions']} questions answered',
+                    style: const TextStyle(color: AppColors.muted),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              '$score%',
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
