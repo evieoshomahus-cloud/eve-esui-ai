@@ -78,6 +78,7 @@ class _EveShellState extends State<EveShell> {
   bool _submittingLearningAnswer = false;
   bool _uploadingAttachment = false;
   int _pageIndex = 0;
+  final List<int> _pageHistory = <int>[];
 
   EveRole _role = EveRole.guest;
   String? _selectedUserId;
@@ -212,6 +213,7 @@ class _EveShellState extends State<EveShell> {
       _selectedUserId = user.userId;
       _sessionStarted = true;
       _pageIndex = 0;
+      _pageHistory.clear();
       _suggestions = _starterSuggestions(role);
       _pendingAttachments = const [];
       _attachmentError = null;
@@ -252,6 +254,7 @@ class _EveShellState extends State<EveShell> {
     setState(() {
       _sessionStarted = false;
       _pageIndex = 0;
+      _pageHistory.clear();
       _role = EveRole.guest;
       _selectedUserId = null;
       _messages = const [];
@@ -266,8 +269,44 @@ class _EveShellState extends State<EveShell> {
   }
 
   Future<void> _askEve(String prompt) async {
-    setState(() => _pageIndex = 1);
+    _openPage(1);
     await _sendMessage(prompt);
+  }
+
+  void _openPage(int index, {bool remember = true}) {
+    if (_pageIndex == index) return;
+    setState(() {
+      if (remember &&
+          (_pageHistory.isEmpty || _pageHistory.last != _pageIndex)) {
+        _pageHistory.add(_pageIndex);
+      }
+      _pageIndex = index;
+    });
+  }
+
+  void _replacePage(int index) {
+    if (_pageIndex == index) return;
+    setState(() {
+      if (_pageHistory.isNotEmpty && _pageHistory.last == index) {
+        _pageHistory.removeLast();
+      }
+      _pageIndex = index;
+    });
+  }
+
+  void _handleBackNavigation() {
+    if (_pageHistory.isNotEmpty) {
+      final previous = _pageHistory.removeLast();
+      setState(() => _pageIndex = previous);
+      return;
+    }
+    if (_pageIndex != 0) {
+      setState(() => _pageIndex = 0);
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('You are already on the home dashboard.')),
+    );
   }
 
   Future<void> _attachFile() async {
@@ -466,8 +505,8 @@ class _EveShellState extends State<EveShell> {
       setState(() {
         _apiOnline = true;
         _learningSession = session;
-        _pageIndex = 5;
       });
+      _openPage(5);
     } catch (error) {
       if (!mounted) return;
       setState(() => _apiOnline = false);
@@ -530,100 +569,113 @@ class _EveShellState extends State<EveShell> {
       );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 980;
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            surfaceTintColor: Colors.white,
-            titleSpacing: 14,
-            title: Row(
-              children: [
-                Image.asset('assets/esui-logo.png', width: 36, height: 36),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackNavigation();
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 980;
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
+              leading: _pageIndex == 0
+                  ? null
+                  : IconButton(
+                      onPressed: _handleBackNavigation,
+                      tooltip: 'Back',
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+              titleSpacing: 14,
+              title: Row(
+                children: [
+                  Image.asset('assets/esui-logo.png', width: 36, height: 36),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Eve',
+                          style: TextStyle(fontWeight: FontWeight.w900),
+                        ),
+                        Text(
+                          'Edo State University Iyamho',
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: AppColors.muted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                ApiDot(online: _apiOnline, loading: _loadingUsers),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: _logout,
+                  tooltip: 'Logout',
+                  icon: const Icon(Icons.logout),
+                ),
+                const SizedBox(width: 4),
+                IconButton.filledTonal(
+                  onPressed: _showAccountSheet,
+                  tooltip: 'Account',
+                  icon: const Icon(Icons.person),
+                ),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+            body: wide
+                ? Row(
                     children: [
-                      const Text(
-                        'Eve',
-                        style: TextStyle(fontWeight: FontWeight.w900),
+                      EveRail(
+                        selectedIndex: _pageIndex > 4 ? 2 : _pageIndex,
+                        onSelect: _openPage,
                       ),
-                      Text(
-                        'Edo State University Iyamho',
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(color: AppColors.muted),
+                      Expanded(child: _currentPage(wide)),
+                    ],
+                  )
+                : _currentPage(wide),
+            bottomNavigationBar: wide
+                ? null
+                : NavigationBar(
+                    selectedIndex: _pageIndex > 4 ? 2 : _pageIndex,
+                    onDestinationSelected: _openPage,
+                    destinations: const [
+                      NavigationDestination(
+                        icon: Icon(Icons.home_outlined),
+                        selectedIcon: Icon(Icons.home),
+                        label: 'Home',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.chat_bubble_outline),
+                        selectedIcon: Icon(Icons.chat_bubble),
+                        label: 'Ask',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.apps_outlined),
+                        selectedIcon: Icon(Icons.apps),
+                        label: 'Tools',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.how_to_reg_outlined),
+                        selectedIcon: Icon(Icons.how_to_reg),
+                        label: 'Admission',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.person_outline),
+                        selectedIcon: Icon(Icons.person),
+                        label: 'Profile',
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            actions: [
-              ApiDot(online: _apiOnline, loading: _loadingUsers),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: _logout,
-                tooltip: 'Logout',
-                icon: const Icon(Icons.logout),
-              ),
-              const SizedBox(width: 4),
-              IconButton.filledTonal(
-                onPressed: _showAccountSheet,
-                tooltip: 'Account',
-                icon: const Icon(Icons.person),
-              ),
-              const SizedBox(width: 10),
-            ],
-          ),
-          body: wide
-              ? Row(
-                  children: [
-                    EveRail(
-                      selectedIndex: _pageIndex > 4 ? 2 : _pageIndex,
-                      onSelect: (index) => setState(() => _pageIndex = index),
-                    ),
-                    Expanded(child: _currentPage(wide)),
-                  ],
-                )
-              : _currentPage(wide),
-          bottomNavigationBar: wide
-              ? null
-              : NavigationBar(
-                  selectedIndex: _pageIndex > 4 ? 2 : _pageIndex,
-                  onDestinationSelected: (index) =>
-                      setState(() => _pageIndex = index),
-                  destinations: const [
-                    NavigationDestination(
-                      icon: Icon(Icons.home_outlined),
-                      selectedIcon: Icon(Icons.home),
-                      label: 'Home',
-                    ),
-                    NavigationDestination(
-                      icon: Icon(Icons.chat_bubble_outline),
-                      selectedIcon: Icon(Icons.chat_bubble),
-                      label: 'Ask',
-                    ),
-                    NavigationDestination(
-                      icon: Icon(Icons.apps_outlined),
-                      selectedIcon: Icon(Icons.apps),
-                      label: 'Tools',
-                    ),
-                    NavigationDestination(
-                      icon: Icon(Icons.how_to_reg_outlined),
-                      selectedIcon: Icon(Icons.how_to_reg),
-                      label: 'Admission',
-                    ),
-                    NavigationDestination(
-                      icon: Icon(Icons.person_outline),
-                      selectedIcon: Icon(Icons.person),
-                      label: 'Profile',
-                    ),
-                  ],
-                ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -653,10 +705,10 @@ class _EveShellState extends State<EveShell> {
           role: _role,
           onPrompt: _askEve,
           onStartLearningSession: _startLearningSession,
-          onOpenAdmission: () => setState(() => _pageIndex = 3),
-          onOpenKnowledgeAdmin: () => setState(() => _pageIndex = 6),
-          onOpenPeerNotes: () => setState(() => _pageIndex = 7),
-          onOpenPeerReview: () => setState(() => _pageIndex = 8),
+          onOpenAdmission: () => _openPage(3),
+          onOpenKnowledgeAdmin: () => _openPage(6),
+          onOpenPeerNotes: () => _openPage(7),
+          onOpenPeerReview: () => _openPage(8),
         );
       case 3:
         return AdmissionPage(
@@ -690,7 +742,7 @@ class _EveShellState extends State<EveShell> {
           answerController: _sessionAnswerController,
           submitting: _submittingLearningAnswer,
           onSubmit: _submitLearningAnswer,
-          onBack: () => setState(() => _pageIndex = 2),
+          onBack: () => _replacePage(2),
           onAskEve: _askEve,
         );
       case 6:
@@ -698,20 +750,20 @@ class _EveShellState extends State<EveShell> {
           api: _api,
           user: _selectedUser,
           role: _role,
-          onBack: () => setState(() => _pageIndex = 2),
+          onBack: () => _replacePage(2),
         );
       case 7:
         return StudentPeerNotesPage(
           api: _api,
           user: _selectedUser,
-          onBack: () => setState(() => _pageIndex = 2),
+          onBack: () => _replacePage(2),
         );
       case 8:
         return PeerNoteReviewPage(
           api: _api,
           user: _selectedUser,
           role: _role,
-          onBack: () => setState(() => _pageIndex = 2),
+          onBack: () => _replacePage(2),
         );
       default:
         return HomePage(
@@ -719,7 +771,7 @@ class _EveShellState extends State<EveShell> {
           role: _role,
           online: _apiOnline,
           onPrompt: _askEve,
-          onNavigate: (index) => setState(() => _pageIndex = index),
+          onNavigate: _openPage,
         );
     }
   }
