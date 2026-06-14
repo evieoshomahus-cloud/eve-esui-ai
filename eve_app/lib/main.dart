@@ -592,7 +592,7 @@ class _EveShellState extends State<EveShell> {
               titleSpacing: 14,
               title: Row(
                 children: [
-                  Image.asset('assets/esui-logo.png', width: 36, height: 36),
+                  const EsuiLogo(size: 36),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -815,7 +815,7 @@ class LoginScreen extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 960),
               child: Column(
                 children: [
-                  Image.asset('assets/esui-logo.png', width: 116, height: 116),
+                  const EsuiLogo(size: 116),
                   const SizedBox(height: 16),
                   Text(
                     'Eve',
@@ -6842,6 +6842,53 @@ class SectionTitle extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class EsuiLogo extends StatelessWidget {
+  const EsuiLogo({required this.size, super.key});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Image.asset(
+        'assets/esui-logo.png',
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
+        semanticLabel: 'Edo State University Iyamho logo',
+        errorBuilder: (context, error, stackTrace) => Image.network(
+          '/assets/assets/esui-logo.png',
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          errorBuilder: (context, error, stackTrace) =>
+              _LogoFallback(size: size),
+        ),
+      ),
+    );
+  }
+}
+
+class _LogoFallback extends StatelessWidget {
+  const _LogoFallback({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppColors.softBlue,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Icon(Icons.school, color: AppColors.blue, size: size * 0.55),
     );
   }
 }
