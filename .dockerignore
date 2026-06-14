@@ -1,0 +1,16 @@
+.env
+.git
+.idea
+.tools
+**/__pycache__
+**/*.pyc
+eve_app/.dart_tool
+eve_app/build
+eve_app/android/.gradle
+storage
+ngrok-temp-random.yml
+project_docs/*.docx
+project_docs/*.pptx
+*.pdf
+*.docx
+*.pptx

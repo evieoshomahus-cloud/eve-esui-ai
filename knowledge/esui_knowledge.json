@@ -1,0 +1,909 @@
+[
+  {
+    "id": "esui-about-001",
+    "title": "About Edo State University Iyamho",
+    "category": "institution",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "about",
+      "vision",
+      "mission",
+      "iyamho",
+      "history"
+    ],
+    "summary": "Edo State University Iyamho is a state-owned university established to expand quality tertiary education and develop human capital in Edo State.",
+    "content": "The university was established under Edo State University Iyamho laws and recognized by the National Universities Commission on 23 March 2016 as Nigeria's 41st state-owned university and 142nd university. Its vision is to become a centre of excellence in quality teaching, research, innovation, and community development.",
+    "source_url": "https://edouniversity.edu.ng/home/about",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-programmes-001",
+    "title": "Programmes and Study Options",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "programmes",
+      "undergraduate",
+      "postgraduate",
+      "conversion",
+      "jupeb"
+    ],
+    "summary": "ESUI advertises Undergraduate, Postgraduate, Conversion, and JUPEB study paths through its programmes page.",
+    "content": "Prospective candidates should select the appropriate study path, verify course requirements from official admissions pages, and submit documents through approved ESUI channels.",
+    "source_url": "https://edouniversity.edu.ng/home/programs",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-lms-001",
+    "title": "Canvas LMS and Digital Learning",
+    "category": "learning",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "canvas",
+      "lms",
+      "digital learning",
+      "course materials"
+    ],
+    "summary": "ESUI promotes Canvas LMS as a major digital-learning platform for real-time academic interaction.",
+    "content": "Eve should integrate with the LMS in a production version so students can ask course-material questions, receive revision support, and access lecturer-approved learning resources.",
+    "source_url": "https://edouniversity.edu.ng/",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-admission-roadmap-001",
+    "title": "Admission Roadmap",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest"
+    ],
+    "tags": [
+      "admission",
+      "apply",
+      "jamb",
+      "direct entry",
+      "screening"
+    ],
+    "summary": "Candidates should apply through the official admission route, monitor screening updates, keep receipts, and prepare required documents early.",
+    "content": "Eve can guide candidates through a general admission roadmap, but final eligibility, screening dates, and admission decisions must come from official ESUI admission channels.",
+    "source_url": "https://edouniversity.edu.ng/",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-computer-science-001",
+    "title": "Computer Science Readiness",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "computer science",
+      "jamb",
+      "o-level",
+      "mathematics",
+      "programming"
+    ],
+    "summary": "Computer Science candidates should strengthen Mathematics, English, science subjects, logical reasoning, and basic programming readiness.",
+    "content": "Eve's admission estimator gives readiness guidance based on JAMB score and O-Level grades. It does not guarantee admission; it identifies preparation gaps.",
+    "source_url": "https://edouniversity.edu.ng/home/programs",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-public-news-001",
+    "title": "Latest News Handling",
+    "category": "news",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "latest news",
+      "calendar",
+      "events",
+      "announcement"
+    ],
+    "summary": "The ESUI website publishes latest news and upcoming activities, including academic calendar and convocation information.",
+    "content": "A production Eve system should pull from official ESUI news feeds or approved website pages. The prototype keeps answers grounded in curated knowledge and flags live news as requiring official feed integration.",
+    "source_url": "https://edouniversity.edu.ng/",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-student-privacy-001",
+    "title": "Student Privacy Rule",
+    "category": "security",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "privacy",
+      "records",
+      "cgpa",
+      "fees",
+      "authorization"
+    ],
+    "summary": "A student can only access their own CGPA, course scores, fee status, timetable, and personalized advice.",
+    "content": "Eve rejects attempts by one student to inspect another student's records. In production, this rule should be enforced through identity management, access tokens, database policies, and audit logs.",
+    "source_url": null,
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-lecturer-scope-001",
+    "title": "Lecturer Analytics Scope",
+    "category": "analytics",
+    "audience": [
+      "lecturer"
+    ],
+    "tags": [
+      "lecturer",
+      "analytics",
+      "course",
+      "attendance",
+      "ca"
+    ],
+    "summary": "Lecturers should only see analytics for courses assigned to their account.",
+    "content": "Lecturer analytics may include class averages, previous cohort comparison, attendance trends, assignment submission, weak topics, and best-performing students for assigned courses only.",
+    "source_url": null,
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-prompt-security-001",
+    "title": "Prompt Injection Guardrail",
+    "category": "security",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "prompt injection",
+      "guardrail",
+      "cybersecurity",
+      "data exfiltration"
+    ],
+    "summary": "Eve must block prompts that try to override instructions, reveal hidden prompts, bypass authentication, or dump private records.",
+    "content": "The guardrail layer inspects messages before retrieval and answer generation. Suspicious requests are blocked and logged with an audit label.",
+    "source_url": "https://owasp.org/www-project-top-10-for-large-language-model-applications",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-fees-001",
+    "title": "Payments, Fees, and Dues",
+    "category": "fees",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "fees",
+      "dues",
+      "payment",
+      "receipt",
+      "clearance"
+    ],
+    "summary": "Students should use official ESUI payment channels, keep receipts, and verify departmental or faculty dues from approved offices.",
+    "content": "The prototype can show sample personal fee status for signed-in demo students. In production, Eve should connect to verified student finance records through secure APIs. Students should not pay through unofficial links or social-media payment instructions.",
+    "source_url": "https://edouniversity.edu.ng/",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-payment-links-001",
+    "title": "Official ESUI Payment and Portal Links",
+    "category": "fees",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "payment portal",
+      "school fees",
+      "quick pay",
+      "ais",
+      "student portal",
+      "fees",
+      "transcript",
+      "certificate",
+      "receipt"
+    ],
+    "summary": "Official public payment guidance should direct users to ESUI AIS, fee description, and Quick Pay pages while warning against unofficial payment links.",
+    "content": "Official ESUI links for payment-related guidance include AIS login for account-based student access: https://edouniversity.edu.ng/Identity/Account/Login ; undergraduate fee description for published fee information: https://edouniversity.edu.ng/ug-fee-description ; and Quick Pay for certificate, transcript, entrepreneurship, and other public payment items: https://edouniversity.edu.ng/quickpay . Students should confirm the URL begins with https://edouniversity.edu.ng/ before entering personal or payment details.",
+    "source_url": "https://edouniversity.edu.ng/quickpay",
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-career-001",
+    "title": "Career and Skill Development",
+    "category": "career",
+    "audience": [
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "skills",
+      "career",
+      "employability",
+      "computer science"
+    ],
+    "summary": "Eve should guide students toward practical skills connected to their course, such as app development, data analysis, cybersecurity practice, and professional communication.",
+    "content": "For Computer Science students, Eve can recommend progressive projects: portfolio website, CRUD application, API integration, secure login, database design, cloud deployment, and final capstone documentation.",
+    "source_url": "https://edouniversity.edu.ng/",
+    "updated": "2026-06-04"
+  },
+  {
+    "id": "esui-source-policy-001",
+    "title": "Eve Source Hierarchy",
+    "category": "governance",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "source",
+      "knowledge base",
+      "verified",
+      "website",
+      "governance",
+      "reliable"
+    ],
+    "summary": "Eve should treat curated ESUI knowledge and approved internal records as primary sources, while the public website is a supplementary source for current public updates.",
+    "content": "The preferred production source hierarchy is: approved ESUI knowledge base, departmental/course documents, student records available through secure APIs, lecturer-approved learning resources, academic calendar data, finance/admission system data, and then public website pages for current public announcements. The public website should not be the only source because it may be unavailable or may not contain all operational details.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-academic-progress-001",
+    "title": "Personalized Academic Progress Tracking",
+    "category": "learning",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "academic progress",
+      "personalized learning",
+      "weak topics",
+      "tracking",
+      "dashboard",
+      "intervention"
+    ],
+    "summary": "Eve tracks academic progress by combining course performance, weak topics, study activity, learning-session results, and intervention recommendations.",
+    "content": "For students, Eve should identify weak courses, weak topics, revision priorities, mock-test needs, and weekly study actions. For lecturers, Eve should aggregate assigned-course trends, repeated weak topics, saved learning-session scores, and suggested interventions without exposing unauthorized student records.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-course-materials-001",
+    "title": "Course Materials and Lecturer-Approved Content",
+    "category": "learning",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "course materials",
+      "course outline",
+      "lecture notes",
+      "lms",
+      "lecturer approved",
+      "rag"
+    ],
+    "summary": "A production Eve system should retrieve answers from lecturer-approved course outlines, lecture notes, LMS files, and departmental learning resources.",
+    "content": "When a student asks course-specific academic questions, Eve should first use approved course materials and lecturer-validated resources. If the question is outside the available course materials, Eve should answer generally and state that lecturer confirmation is needed for class-specific requirements, marking schemes, or assessment deadlines.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-academic-calendar-001",
+    "title": "Academic Calendar and Date-Sensitive Questions",
+    "category": "planning",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "academic calendar",
+      "dates",
+      "deadline",
+      "semester",
+      "resumption",
+      "examination",
+      "convocation"
+    ],
+    "summary": "Date-sensitive answers should come from the approved academic calendar or live official announcements, not from model memory.",
+    "content": "Eve should not invent resumption dates, examination dates, convocation dates, admission deadlines, or payment deadlines. In production, these should come from an approved academic-calendar source managed by the university. In the prototype, Eve should state when a date must be confirmed through official ESUI channels.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-admission-requirements-002",
+    "title": "Admission Requirement Guidance",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest"
+    ],
+    "tags": [
+      "admission requirements",
+      "utme",
+      "direct entry",
+      "o-level",
+      "screening",
+      "jamb",
+      "documents"
+    ],
+    "summary": "Eve can guide applicants on general admission preparation while avoiding unsupported cut-off marks or guaranteed admission claims.",
+    "content": "Eve should help applicants prepare likely required documents, understand the difference between UTME and Direct Entry routes, review O-Level readiness, plan JAMB/subject preparation, and monitor official screening instructions. Exact cut-off marks, departmental subject combinations, screening dates, and final admission decisions must be verified from official ESUI admission channels.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-portal-support-001",
+    "title": "Student Portal and Account Support",
+    "category": "portal",
+    "audience": [
+      "student"
+    ],
+    "tags": [
+      "portal",
+      "login",
+      "student account",
+      "registration",
+      "clearance",
+      "password"
+    ],
+    "summary": "Eve can provide general portal guidance but should not request passwords, expose login details, or bypass official ICT support.",
+    "content": "For portal issues, Eve should guide students to check official login pages, confirm their matriculation or application details, use approved password-reset routes, and contact the designated university ICT/helpdesk channel for account-specific issues. Eve must never ask for or store passwords.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-department-knowledge-001",
+    "title": "Departmental Knowledge Ownership",
+    "category": "governance",
+    "audience": [
+      "lecturer"
+    ],
+    "tags": [
+      "department",
+      "data owner",
+      "approval",
+      "knowledge management",
+      "quality assurance"
+    ],
+    "summary": "Each department should own and approve the departmental knowledge that Eve uses for programme, course, and policy guidance.",
+    "content": "A future ESUI deployment should assign data owners for admissions, registry, ICT, finance, departments, and academic planning. These owners should review documents before they enter Eve's knowledge base and periodically update stale entries. This improves answer quality and creates accountability for AI-assisted academic support.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-defense-scope-001",
+    "title": "Prototype Scope for Defense",
+    "category": "governance",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "prototype",
+      "defense",
+      "scope",
+      "limitations",
+      "final year project"
+    ],
+    "summary": "The project demonstrates the design and implementation of an AI system for personalized learning and academic progress tracking using sample data and curated knowledge.",
+    "content": "During defense, the system should be presented as a functional prototype that demonstrates architecture, role-based access, retrieval-augmented responses, OpenAI response generation, student progress tracking, saved learning sessions, lecturer insights, and source transparency. It does not claim to be connected to live ESUI student records unless official integration is later approved.",
+    "source_url": null,
+    "updated": "2026-06-12"
+  },
+  {
+    "id": "esui-utme-admission-2025-2026",
+    "title": "2025/2026 UTME Admission Requirements",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest"
+    ],
+    "tags": [
+      "utme",
+      "admission",
+      "application",
+      "o-level",
+      "screening",
+      "jamb",
+      "requirements"
+    ],
+    "summary": "ESUI's 2025/2026 undergraduate admission page states that UTME applicants must have written the 2025 UTME, complete the online form, meet departmental O-Level requirements, and go through screening.",
+    "content": "For UTME admission guidance, Eve should tell applicants to use the official ESUI undergraduate admission page, complete the online application form, and confirm departmental requirements. The official page states that applicants need five relevant O-Level credit passes including English Language and Mathematics at GCE O-Level, SSCE, NECO, NABTEB, or equivalent, at not more than two sittings. Medicine and Surgery requires the five credits, including Mathematics and English, at one sitting only. Applicants awaiting results may apply, and all applicants are required to go through the ESUI screening exercise. Candidates who wrote the 2025 UTME but did not choose ESUI as first choice are instructed to change institution/course through JAMB and complete the ESUI online application form. Eve should not guarantee admission or invent cut-off marks.",
+    "source_url": "https://edouniversity.edu.ng/admissions/undergraduate",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-direct-entry-transfer-2025-2026",
+    "title": "Direct Entry and Transfer Admission Guidance",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest"
+    ],
+    "tags": [
+      "direct entry",
+      "transfer",
+      "admission",
+      "jamb",
+      "ijmb",
+      "jupeb",
+      "nce",
+      "ond",
+      "hnd"
+    ],
+    "summary": "ESUI accepts specified Direct Entry qualifications for 200 Level admission and also lists conditions for inter-university transfer candidates.",
+    "content": "For Direct Entry, the official ESUI undergraduate admission page says candidates are required to purchase and process the JAMB Direct Entry form. Acceptable routes include a minimum Merit pass in NCE, Credit in OND/HND, a university degree in a relevant discipline, two Advanced Level passes or equivalent in relevant subjects, IJMB, JUPEB, or Cambridge moderated School of Basic Studies at acceptable grade levels, plus the relevant O-Level requirements. Transfer candidates must complete the prescribed inter-university transfer form, pass ESUI interview/screening, meet minimum entry requirements, hold a JAMB admission letter to the current university, ensure their transcript reaches the ESUI Admissions Office, and have a CGPA of at least 1.5. The official page lists Post UTME/DE application fee as N2,000 and transfer application fee as N60,000 for the 2025/2026 application context.",
+    "source_url": "https://edouniversity.edu.ng/admissions/undergraduate",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-computer-science-requirements-2025-2026",
+    "title": "Computer Science Admission Requirements",
+    "category": "admission",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "computer science",
+      "b.sc",
+      "o-level",
+      "utme subjects",
+      "mathematics",
+      "physics",
+      "direct entry",
+      "science"
+    ],
+    "summary": "The ESUI undergraduate admission page lists B.Sc. Computer Science requirements under the Faculty of Science.",
+    "content": "For B.Sc. Computer Science, the official ESUI undergraduate admission page lists five SSCE credit passes or equivalent including English Language, Mathematics, Physics, and two other science subjects at not more than two sittings. Direct Entry routes listed for Computer Science include two A-Level passes in science subjects including Mathematics, NCE with at least Merit in Mathematics and one other Science or Social Science subject, OND/HND with Credit passes from a recognized institution plus O-Level requirements, and IJMB/JUPEB. The UTME subject combination shown is Mathematics, Physics, and one of Biology, Chemistry, Agricultural Science, Economics, or Geography. Eve should use this entry when applicants ask specifically about Computer Science readiness or requirements.",
+    "source_url": "https://edouniversity.edu.ng/admissions/undergraduate",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-calendar-2025-2026-second-semester",
+    "title": "2025/2026 Academic Calendar - Second Semester",
+    "category": "planning",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "academic calendar",
+      "second semester",
+      "revision",
+      "examination",
+      "gst",
+      "ent",
+      "resumption",
+      "session"
+    ],
+    "summary": "The approved 2025/2026 academic calendar gives second-semester dates for lectures, revision, GST/ENT exams, faculty examinations, long vacation, results, and next session.",
+    "content": "For the 2025/2026 second semester calendar, ESUI's approved calendar states that virtual lectures were scheduled for 30 March to 2 April 2026 and 7 April to 10 April 2026, students arrived in halls on 11 April 2026, and physical continuation of second-semester lectures began on 13 April 2026. The calendar lists 13 June to 17 June 2026 for revision/continuous assessment, 17 June 2026 as end of second-semester lectures, 29 June 2026 for GST/ENT examinations, 6 July 2026 for commencement of second-semester examinations in all faculties, 24 July 2026 for conclusion of second-semester examinations, 25 July 2026 for long vacation, 14 August 2026 for departments and faculties to consider sessional results, 20 August 2026 for Senate consideration and approval of sessional results, and 5 October 2026 for commencement of the 2026/2027 academic session. Eve should always mention that date-sensitive information should be confirmed on the official calendar page.",
+    "source_url": "https://edouniversity.edu.ng/academic-calender",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-undergraduate-fees-science-2025-2026",
+    "title": "Science and Computing Undergraduate Fees 2025/2026",
+    "category": "fees",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "fees",
+      "computer science",
+      "software engineering",
+      "cyber security",
+      "acceptance fee",
+      "lms",
+      "school fees",
+      "payment safety"
+    ],
+    "summary": "The official 2025/2026 undergraduate fee page lists selected Science and Computing fees, including Computer Science, Software Engineering, and Cyber Security.",
+    "content": "For 2025/2026 undergraduate fee guidance, the official ESUI fee page lists Computer Science B.Sc. school fees for fresh students as N603,500 excluding accommodation, Software Engineering B.Sc. as N603,500 excluding accommodation, and Cyber Security B.Sc. as N603,500 excluding accommodation. The same page lists acceptance fee as N70,000, Edo Health Insurance Scheme as N25,000 per session, LMS fee as N40,000 for students and N30,000 for parents where optional, and accommodation as compulsory with ranges from N110,000 to N250,000. Eve should show these as published 2025/2026 figures, remind users that fees can change, and direct payments only through official ESUI links such as https://edouniversity.edu.ng/ug-fee-description and https://edouniversity.edu.ng/quickpay. Students should avoid unofficial payment links and should keep payment receipts or reference numbers.",
+    "source_url": "https://edouniversity.edu.ng/ug-fee-description",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-accommodation-2025-2026",
+    "title": "Accommodation and Hostel Fee Guidance",
+    "category": "fees",
+    "audience": [
+      "public",
+      "guest",
+      "student"
+    ],
+    "tags": [
+      "accommodation",
+      "hostel",
+      "halls of residence",
+      "fees",
+      "payment",
+      "bed space",
+      "student affairs"
+    ],
+    "summary": "ESUI's undergraduate fee page states that accommodation is compulsory and lists hostel categories, price ranges, and allocation guidance.",
+    "content": "The official ESUI undergraduate fee page states that accommodation is compulsory for all students, with accommodation fees ranging from N110,000 to N250,000. Listed hostel options include regular lodge down bunk or up bunk categories, premium lodge, and premium villa lodge. The page says allocation of rooms and bed spaces is automated based on when payments are received and is usually first come, first served. Eve should advise students to confirm current hostel availability through official ESUI channels, pay only through official ESUI payment routes such as https://edouniversity.edu.ng/ug-fee-description or https://edouniversity.edu.ng/quickpay, keep receipts/reference numbers, and avoid unofficial payment instructions.",
+    "source_url": "https://edouniversity.edu.ng/ug-fee-description",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-quickpay-ais-2026",
+    "title": "Quick Pay and AIS Login Guidance",
+    "category": "portal",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "quick pay",
+      "ais",
+      "student portal",
+      "payment",
+      "transaction",
+      "receipt",
+      "rrr",
+      "login"
+    ],
+    "summary": "ESUI Quick Pay supports selected public payments and payment verification, while AIS login is for account-based access using university email and password.",
+    "content": "The official Quick Pay page lets users make quick payments by selecting programme type, payment type, payment item, and entering personal details. It also supports verifying a transaction and continuing an existing transaction using a reference number/RRR. The AIS login page states that users log in with university email and password. Eve should provide these official links when students ask about payments or portal access: Quick Pay at https://edouniversity.edu.ng/quickpay and AIS login at https://edouniversity.edu.ng/Identity/Account/Login. For safety, Eve should warn users to use only official edouniversity.edu.ng links, avoid unofficial payment links, never share passwords in chat, and keep receipts/reference numbers.",
+    "source_url": "https://edouniversity.edu.ng/quickpay",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-canvas-lms-2026",
+    "title": "Canvas LMS Learning Support",
+    "category": "learning",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "canvas",
+      "lms",
+      "digital learning",
+      "online lectures",
+      "course materials",
+      "real-time interaction"
+    ],
+    "summary": "The ESUI homepage describes Canvas LMS as a major platform for digital learning and real-time interaction between learners and educators.",
+    "content": "ESUI's homepage states that Edo State University Iyamho adopted Canvas as its Learning Management System and describes the ESUI LMS as a digital platform where learners and educators can interact in real time on a 24/7 basis. Eve should use this entry when students ask about LMS, online learning, course materials, or lecturer-approved learning resources. A production version of Eve should integrate with LMS APIs or approved exported LMS content so students can ask course-specific questions grounded in lecturer-approved materials.",
+    "source_url": "https://edouniversity.edu.ng/",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "esui-contact-location-2026",
+    "title": "ESUI Contact and Location",
+    "category": "institution",
+    "audience": [
+      "public",
+      "guest",
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "contact",
+      "address",
+      "location",
+      "registrar",
+      "email",
+      "admissions"
+    ],
+    "summary": "Official ESUI pages list the university location, registrar email, and admission office contact details for public enquiries.",
+    "content": "Official ESUI pages list the university location as Km 7, Auchi-Abuja Road, Iyamho-Uzairue, Edo State, Nigeria, and registrar email as registrar@edouniversity.edu.ng. The undergraduate admission page also lists Admissions Office email as admissions@edouniversity.edu.ng and phone numbers 07076317967, 09025412171, and 08125967010 for admission enquiries in the 2025/2026 admission context. Eve should provide these as official contact points and should avoid collecting sensitive personal details or passwords in chat.",
+    "source_url": "https://edouniversity.edu.ng/home/about",
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-hostel-appliances-001",
+    "title": "Demo Hostel Appliance Guidance",
+    "category": "student_life",
+    "audience": [
+      "student",
+      "guest"
+    ],
+    "tags": [
+      "demo",
+      "hostel",
+      "appliances",
+      "student affairs",
+      "safety",
+      "residence"
+    ],
+    "summary": "Demo placeholder: hostel appliance rules should be confirmed by Student Affairs or Hall Administration before production use.",
+    "content": "Demo placeholder information for the prototype: students should treat hostel appliance rules as safety-sensitive and confirm the current approved list with Student Affairs or Hall Administration. Eve may advise that low-risk personal items such as phone chargers, laptops, reading lamps, and small rechargeable devices are typically easier to approve, while heat-generating or high-power appliances such as electric cookers, hot plates, kettles, irons, immersion heaters, and large refrigerators may require explicit hostel approval or may be restricted. Eve should not present this demo guidance as official ESUI policy until an approved hostel handbook or Student Affairs circular is added.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-library-use-001",
+    "title": "Demo Library Use and Study Support",
+    "category": "learning",
+    "audience": [
+      "student",
+      "guest"
+    ],
+    "tags": [
+      "demo",
+      "library",
+      "study",
+      "research",
+      "borrow books",
+      "reading"
+    ],
+    "summary": "Demo placeholder: library rules and borrowing privileges should be replaced with approved ESUI library policy.",
+    "content": "Demo placeholder information for the prototype: Eve can guide students to use the university library for quiet study, textbooks, research support, and academic referencing. Students should go with a valid student ID card, follow borrowing and return rules, respect quiet-study areas, and ask library staff for help finding resources. Exact opening hours, borrowing limits, penalties, digital database access, and final library clearance requirements must be replaced with approved ESUI library information before production deployment.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-clinic-medical-support-001",
+    "title": "Demo Clinic and Medical Support Guidance",
+    "category": "student_life",
+    "audience": [
+      "student",
+      "guest"
+    ],
+    "tags": [
+      "demo",
+      "clinic",
+      "medical",
+      "health",
+      "emergency",
+      "student welfare"
+    ],
+    "summary": "Demo placeholder: medical and emergency advice must be confirmed with approved ESUI clinic and student-welfare procedures.",
+    "content": "Demo placeholder information for the prototype: Eve can advise students with health concerns to visit the university clinic or contact approved student-welfare channels, especially for fever, injury, stress, medication concerns, or emergencies. Eve should not diagnose illness or prescribe medication. For urgent cases, Eve should tell the student to seek immediate help from the clinic, hostel supervisor, security, or a trusted university officer. Exact clinic hours, emergency contacts, insurance procedures, and referral rules should be replaced with approved ESUI medical-center information.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-id-card-clearance-001",
+    "title": "Demo Student ID Card and Clearance Guidance",
+    "category": "portal",
+    "audience": [
+      "student"
+    ],
+    "tags": [
+      "demo",
+      "id card",
+      "clearance",
+      "student affairs",
+      "lost card",
+      "registration"
+    ],
+    "summary": "Demo placeholder: ID-card replacement and clearance steps should be replaced with approved Registry or Student Affairs procedures.",
+    "content": "Demo placeholder information for the prototype: if a student loses an ID card or has clearance issues, Eve should advise them to report through the approved university office, avoid using another student's ID card, and keep evidence of payment or registration where applicable. A likely workflow is to confirm identity, report the loss, follow the approved replacement process, and keep any receipt or acknowledgement. Exact replacement fees, office location, forms, and clearance requirements must be replaced with approved ESUI Registry or Student Affairs guidance.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-course-registration-001",
+    "title": "Demo Course Registration Support",
+    "category": "portal",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "demo",
+      "course registration",
+      "portal",
+      "add course",
+      "drop course",
+      "academic adviser"
+    ],
+    "summary": "Demo placeholder: course-registration guidance should be replaced with approved departmental and ICT registration procedures.",
+    "content": "Demo placeholder information for the prototype: Eve can advise students to register courses only through approved portal or departmental channels, confirm compulsory and elective courses with their department, and speak with an academic adviser before adding or dropping a course. Students should not assume a course is registered until the portal or department confirms it. Exact registration deadlines, late-registration penalties, add/drop rules, and adviser approval steps must be replaced with approved ESUI academic and ICT procedures.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-exam-clearance-001",
+    "title": "Demo Examination Clearance Guidance",
+    "category": "planning",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "demo",
+      "exam clearance",
+      "examination",
+      "fees",
+      "registration",
+      "id card"
+    ],
+    "summary": "Demo placeholder: examination-clearance requirements should be replaced with approved Registry, Exams and Records, or faculty information.",
+    "content": "Demo placeholder information for the prototype: Eve can remind students to complete course registration, resolve outstanding fees or dues, confirm examination eligibility, keep their student ID card available, and check official exam instructions before examination week. Eve should not decide whether a student is cleared for exams unless connected to approved records. Exact clearance documents, clearance dates, payment requirements, and examination rules must be replaced with approved ESUI examination and faculty guidance.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-ict-password-reset-001",
+    "title": "Demo ICT and Password Reset Guidance",
+    "category": "security",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "demo",
+      "ict",
+      "password reset",
+      "portal login",
+      "email",
+      "security"
+    ],
+    "summary": "Demo placeholder: account-recovery procedures should be replaced with approved ESUI ICT helpdesk information.",
+    "content": "Demo placeholder information for the prototype: if a student cannot access the portal, email, LMS, or AIS account, Eve should advise them to use only official password-reset or ICT support channels. Eve must never ask for, store, or display passwords, OTPs, recovery codes, or private login details. Students should confirm they are on an official ESUI domain before entering credentials. Exact ICT office contacts, reset forms, service hours, and identity-verification steps must be replaced with approved ESUI ICT guidance.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-departmental-dues-001",
+    "title": "Demo Departmental and Faculty Dues Guidance",
+    "category": "fees",
+    "audience": [
+      "student"
+    ],
+    "tags": [
+      "demo",
+      "departmental dues",
+      "faculty dues",
+      "payment",
+      "receipt",
+      "unofficial"
+    ],
+    "summary": "Demo placeholder: departmental and faculty dues should be confirmed from approved department or faculty officers.",
+    "content": "Demo placeholder information for the prototype: Eve can tell students to confirm departmental or faculty dues with approved department or faculty representatives, keep receipts, and avoid paying into unofficial accounts or links. If an online payment route is approved, students should confirm that it is announced by the university, faculty, or department through trusted channels. Eve should direct official school-fee or public payment questions to https://edouniversity.edu.ng/quickpay or other approved ESUI pages, and warn students against unofficial payment links. Exact dues amounts, deadlines, exemptions, and payment accounts must be replaced with approved department or faculty information.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-complaints-student-support-001",
+    "title": "Demo Complaint and Student Support Channels",
+    "category": "student_life",
+    "audience": [
+      "student",
+      "guest"
+    ],
+    "tags": [
+      "demo",
+      "complaint",
+      "student support",
+      "harassment",
+      "academic adviser",
+      "welfare"
+    ],
+    "summary": "Demo placeholder: complaint routes and student-support contacts should be replaced with approved ESUI welfare and departmental procedures.",
+    "content": "Demo placeholder information for the prototype: Eve can advise students to report academic concerns to their course lecturer, academic adviser, department, or faculty as appropriate, and to report welfare, safety, harassment, or hostel issues through approved student-support channels. Eve should encourage students to document dates, names, receipts, and relevant evidence, while avoiding public accusations or sharing sensitive personal details in chat. Exact complaint forms, escalation routes, support offices, and emergency contacts must be replaced with approved ESUI procedures.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-dress-code-conduct-001",
+    "title": "Demo Dress Code and Student Conduct Guidance",
+    "category": "student_life",
+    "audience": [
+      "student",
+      "guest"
+    ],
+    "tags": [
+      "demo",
+      "dress code",
+      "conduct",
+      "discipline",
+      "student handbook",
+      "campus rules"
+    ],
+    "summary": "Demo placeholder: dress-code and conduct answers should be replaced with approved student handbook rules.",
+    "content": "Demo placeholder information for the prototype: Eve can advise students to dress modestly and professionally for lectures, laboratories, offices, examinations, and official university activities, and to follow campus rules on conduct, respect, safety, and academic integrity. Eve should avoid inventing punishments or exact disciplinary procedures. The approved student handbook or Student Affairs policy should replace this demo entry before production use.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-csc-201-linked-lists-001",
+    "title": "Demo CSC 201 Linked Lists Support",
+    "category": "learning",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "demo",
+      "csc 201",
+      "data structures",
+      "linked lists",
+      "recursion",
+      "practice"
+    ],
+    "summary": "Demo course knowledge for CSC 201: Eve can guide students through linked lists, recursion, tracing, and practice questions.",
+    "content": "Demo placeholder information for the prototype: CSC 201 students should review linked list node structure, insertion, deletion, traversal, recursion, and algorithm tracing. Eve can explain each operation with pseudocode, generate short practice questions, and ask students to trace pointer changes step by step. Lecturers can replace this with approved CSC 201 lecture outcomes, weekly topics, assignment rubrics, recommended textbooks, and department-specific assessment expectations.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-csc-305-secure-coding-001",
+    "title": "Demo CSC 305 Secure Coding Review",
+    "category": "learning",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "demo",
+      "csc 305",
+      "secure coding",
+      "threat modeling",
+      "code review",
+      "cybersecurity"
+    ],
+    "summary": "Demo course knowledge for CSC 305: Eve can support secure coding review, threat modeling, and vulnerability practice.",
+    "content": "Demo placeholder information for the prototype: CSC 305 students should practice identifying input validation issues, insecure authentication flows, weak error handling, poor secrets management, and missing authorization checks. Eve can generate code-review prompts, ask students to classify risks, and suggest safer implementation patterns. Lecturers can replace this with approved CSC 305 course outlines, lab exercises, marking guides, and department-approved security references.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  },
+  {
+    "id": "demo-mth-211-matrix-inverse-001",
+    "title": "Demo MTH 211 Matrix Inverse Support",
+    "category": "learning",
+    "audience": [
+      "student",
+      "lecturer"
+    ],
+    "tags": [
+      "demo",
+      "mth 211",
+      "linear algebra",
+      "matrix inverse",
+      "eigenvalues",
+      "practice"
+    ],
+    "summary": "Demo course knowledge for MTH 211: Eve can help students practise matrix inverse, eigenvalues, and linear transformations.",
+    "content": "Demo placeholder information for the prototype: MTH 211 students should revise determinant rules, row reduction, inverse matrices, eigenvalues, eigenvectors, and linear transformations. Eve can walk through matrix problems one row operation at a time, generate practice questions, and ask students to explain each transformation. Lecturers can replace this with approved MTH 211 weekly outcomes, problem sets, marking rubrics, and recommended texts.",
+    "source_url": null,
+    "updated": "2026-06-13"
+  }
+]

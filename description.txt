@@ -1,0 +1,42 @@
+Goal: Make an EDSU AI that will become in-house/public
+
+Tech Stack:
+1. Pre-trained model
+2. Retrieval-Augmented-Generation (RAG)
+3. Cybersecurity guardrails to prevent AI attacks such as Prompt Injection
+
+Functions:
+1. Prospective Candidates/General Inquirers
+These people can download the app from Google Play Store and sign in as Guest Mode. They can make general inquiries about EDSU such as:
+* When is the next admission cycle?
+* What are the requirements for any course of choice
+* Chances of admission based on O-Level results and JAMB scores
+* Information about deparmental syllabus
+* Feats of the school so far
+* Latest news about the school
+* How to apply for various types of admission (JAMB, Direct Entry, etc.)
+* General admission roadmap
+* General (public) information about Faculty staff and V.C and Registrar
+* Advice on what skills to be strengthened if goal is to study a course of interest
+
+2. Current Students
+These can also download the app from Google Play Store and sign in as STUDENTS. It's functionalities span:
+
+• ALL FUNCTIONALITIES AVAILABLE IN GUEST MODE ABOVE
+• Serve as an Academic Assistant of the student in the following manner:
+- The goal and desire of EDSU is to see students excel in their academics. Eve will be trained with past Q&A datasets for ALL departments. A student in a given department can use the AI to prepare for tests and exams, generate mock exams/tests, and receive detailed explanation of answers. It also observes patterns in questions over the years to enhance the learning process
+- Students can consult with the AI concerning topics being treated in class for more explanations (recall the AI has access to the course syllabus). This process will be enhanced by using course materials provided by lecturers to students to train the LLM (AI). So the AI can try explaining hard-to-grasp concepts in various courses/topics in the courses.
+- Students can also ask questions regarding fee payments and other departmental dues
+- Make inquiries about their faculty(how to pay faculty dues)
+- Interact with the AI on how to plan their activities given the timetable and other school engagements
+- The AI has access to the student's academic records, fee payments, etc. As such, it can provide guidance on how to improve their performance/show areas where there are lapses, and also generate practice tests to help a student improve on courses they find difficulties or have carryovers in
+- Also provide trajectories/roadmaps of further improvements for academically-excelling students, as a way to guide them to become excellent in their chosen profession PRACTICALLY (through real-world excercises, such as app development for computer science students)
+- For Cybersecurity & Privacy purposes, the AI would be personal - meaning it will only have access to the data/academic records of the student currently logged in, not for anyone else.
+
+3. Lecturers/Academic Staff
+These can also download the app from Google Play Store and sign in as LECTUERS. It's functionalities span:
+• Getting statistical insights into students performance FOR THEIR SPECIFIC COURSE (not another), such as:
+- CA Performance of current 200L students against previous 200L students, to see what might have gone wrong or what can be improved, based on (Assignments given, Frequency of lectures, Test scores, and any other relevant factors such as average age of students, gender, etc.)
+- Generate test questions based on lecturer's taste/input, and provide hardening suggestions
+- See best performing students in various levels, etc.
+- Data insights like the above are useful facts that could be used by a lecturer to help improve their teaching methodologies and therefor ensure better performance of students

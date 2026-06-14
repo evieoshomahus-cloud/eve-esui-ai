@@ -1,0 +1,10 @@
+.env
+*.pyc
+__pycache__/
+.dart_tool/
+build/
+.tools/
+storage/
+ngrok-temp-random.yml
+*.log
+*.tmp

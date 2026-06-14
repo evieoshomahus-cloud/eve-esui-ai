@@ -1,0 +1,163 @@
+{
+  "users": {
+    "guest-001": {
+      "user_id": "guest-001",
+      "name": "Guest User",
+      "role": "guest",
+      "department": null,
+      "level": null
+    },
+    "stu-csc-001": {
+      "user_id": "stu-csc-001",
+      "name": "Ada Osagie",
+      "role": "student",
+      "department": "Computer Science",
+      "level": "200"
+    },
+    "stu-acc-002": {
+      "user_id": "stu-acc-002",
+      "name": "Musa Bello",
+      "role": "student",
+      "department": "Accounting",
+      "level": "300"
+    },
+    "lec-csc-001": {
+      "user_id": "lec-csc-001",
+      "name": "Dr. Grace Ehi",
+      "role": "lecturer",
+      "department": "Computer Science",
+      "level": null
+    },
+    "lec-mth-002": {
+      "user_id": "lec-mth-002",
+      "name": "Dr. Victor Ade",
+      "role": "lecturer",
+      "department": "Mathematics",
+      "level": null
+    },
+    "adm-knowledge-001": {
+      "user_id": "adm-knowledge-001",
+      "name": "Mrs. Evelyn Okon",
+      "role": "admin",
+      "department": "Registry / Student Affairs",
+      "level": null
+    }
+  },
+  "students": {
+    "stu-csc-001": {
+      "name": "Ada Osagie",
+      "department": "Computer Science",
+      "level": "200",
+      "cgpa": 3.42,
+      "fees": {
+        "tuition": "paid",
+        "departmental_dues": "pending",
+        "faculty_dues": "pending"
+      },
+      "courses": {
+        "CSC 201": {
+          "title": "Data Structures",
+          "ca": 62,
+          "risk": "medium",
+          "topic_gaps": ["linked lists", "recursion", "algorithm tracing"]
+        },
+        "CSC 203": {
+          "title": "Database Systems",
+          "ca": 74,
+          "risk": "low",
+          "topic_gaps": ["normalization"]
+        },
+        "MTH 211": {
+          "title": "Linear Algebra",
+          "ca": 48,
+          "risk": "high",
+          "topic_gaps": ["eigenvalues", "matrix inverse"]
+        },
+        "GST 201": {
+          "title": "Communication in English",
+          "ca": 68,
+          "risk": "low",
+          "topic_gaps": []
+        }
+      },
+      "timetable": [
+        { "day": "Monday", "time": "09:00", "course": "CSC 201" },
+        { "day": "Tuesday", "time": "11:00", "course": "MTH 211" },
+        { "day": "Thursday", "time": "10:00", "course": "CSC 203" }
+      ]
+    },
+    "stu-acc-002": {
+      "name": "Musa Bello",
+      "department": "Accounting",
+      "level": "300",
+      "cgpa": 3.88,
+      "fees": {
+        "tuition": "paid",
+        "departmental_dues": "paid",
+        "faculty_dues": "pending"
+      },
+      "courses": {
+        "ACC 301": {
+          "title": "Financial Accounting",
+          "ca": 78,
+          "risk": "low",
+          "topic_gaps": ["consolidated accounts"]
+        },
+        "ACC 305": {
+          "title": "Taxation",
+          "ca": 71,
+          "risk": "low",
+          "topic_gaps": []
+        },
+        "BUS 301": {
+          "title": "Business Policy",
+          "ca": 66,
+          "risk": "medium",
+          "topic_gaps": ["market segmentation"]
+        }
+      },
+      "timetable": [
+        { "day": "Monday", "time": "12:00", "course": "ACC 301" },
+        { "day": "Wednesday", "time": "10:00", "course": "ACC 305" }
+      ]
+    }
+  },
+  "lecturers": {
+    "lec-csc-001": {
+      "name": "Dr. Grace Ehi",
+      "department": "Computer Science",
+      "assigned_courses": ["CSC 201", "CSC 305"]
+    },
+    "lec-mth-002": {
+      "name": "Dr. Victor Ade",
+      "department": "Mathematics",
+      "assigned_courses": ["MTH 211"]
+    }
+  },
+  "course_analytics": {
+    "CSC 201": {
+      "current_average": 61.4,
+      "previous_average": 67.9,
+      "attendance_average": 73.0,
+      "assignment_submission_rate": 68.0,
+      "weak_topics": ["recursion", "linked lists", "algorithm tracing"],
+      "best_students": ["Ada Osagie", "Ivie Okoro", "Tunde Lawal"]
+    },
+    "CSC 305": {
+      "current_average": 70.2,
+      "previous_average": 69.5,
+      "attendance_average": 81.0,
+      "assignment_submission_rate": 76.0,
+      "weak_topics": ["threat modeling", "secure coding review"],
+      "best_students": ["Nosa Igbinovia", "Maryam Ali"]
+    },
+    "MTH 211": {
+      "current_average": 55.8,
+      "previous_average": 59.2,
+      "attendance_average": 64.0,
+      "assignment_submission_rate": 61.0,
+      "weak_topics": ["eigenvalues", "linear transformations"],
+      "best_students": ["Efe Omoregie", "Ada Osagie"]
+    }
+  }
+}
