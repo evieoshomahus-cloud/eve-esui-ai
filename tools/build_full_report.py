@@ -102,7 +102,49 @@ This project focused on the design and implementation of an AI system for person
 
 # TABLE OF CONTENTS
 
-Use Microsoft Word to update the automatic table of contents after final formatting.
+CHAPTER ONE
+
+INTRODUCTION
+
+1.1 Background to the Study
+
+1.2 Statement of the Problem
+
+1.3 Aim of the Study
+
+1.4 Objectives of the Study
+
+1.5 Research Questions
+
+1.6 Research Hypotheses
+
+1.7 Significance of the Study
+
+1.8 Scope of the Study
+
+1.9 Limitations of the Study
+
+1.10 Definition of Terms
+
+1.11 Organisation of the Report
+
+CHAPTER TWO
+
+LITERATURE REVIEW
+
+CHAPTER THREE
+
+SYSTEM ANALYSIS AND DESIGN
+
+CHAPTER FOUR
+
+IMPLEMENTATION
+
+CHAPTER FIVE
+
+SUMMARY, CONCLUSION AND RECOMMENDATIONS
+
+REFERENCES
 
 # LIST OF FIGURES
 
@@ -456,6 +498,20 @@ def document_rels_from_template(rels_xml_text: str) -> str:
 
 
 def document_xml_from_template(template_xml: str, body_xml: str) -> str:
+    namespace_additions = {
+        "xmlns:a": "http://schemas.openxmlformats.org/drawingml/2006/main",
+        "xmlns:pic": "http://schemas.openxmlformats.org/drawingml/2006/picture",
+    }
+    document_tag_start = template_xml.find("<w:document")
+    document_tag_end = template_xml.find(">", document_tag_start)
+    if document_tag_end != -1:
+        insertions = []
+        for prefix, uri in namespace_additions.items():
+            if f"{prefix}=" not in template_xml[document_tag_start:document_tag_end]:
+                insertions.append(f' {prefix}="{uri}"')
+        if insertions:
+            template_xml = template_xml[:document_tag_end] + "".join(insertions) + template_xml[document_tag_end:]
+
     body_start = template_xml.find("<w:body>")
     body_end = template_xml.rfind("</w:body>")
     if body_start == -1 or body_end == -1:
