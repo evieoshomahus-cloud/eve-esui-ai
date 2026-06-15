@@ -1,0 +1,24 @@
+CSC 201: Short Note on Linked Lists
+
+A linked list is a linear data structure made up of nodes. Each node usually contains two parts: the data field and a reference or pointer to the next node.
+
+Unlike arrays, linked lists do not require all elements to be stored side by side in memory. This makes insertion and deletion easier in some situations because the program only needs to update links between nodes.
+
+Main parts of a linked list:
+- Node: stores data and the link to the next node.
+- Head: the first node in the list.
+- Tail: the last node in the list, usually pointing to null.
+
+Example:
+If a list contains A -> B -> C, inserting X between A and B means A should point to X, and X should point to B.
+
+Advantages:
+- Easier insertion and deletion compared with arrays.
+- Size can grow or shrink during program execution.
+
+Disadvantages:
+- Accessing a specific item can be slower because the list must be traversed from the head.
+- Extra memory is needed to store links or pointers.
+
+Common exam point:
+A linked list node usually contains data and a reference to the next node.
