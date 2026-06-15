@@ -80,6 +80,78 @@ function Draw-Arrow {
     $pen.Dispose()
 }
 
+function Draw-Line {
+    param(
+        [System.Drawing.Graphics]$G,
+        [int]$X1,
+        [int]$Y1,
+        [int]$X2,
+        [int]$Y2,
+        [string]$Color = "#6b7280"
+    )
+
+    $pen = New-Object System.Drawing.Pen (Color $Color), 3
+    $G.DrawLine($pen, $X1, $Y1, $X2, $Y2)
+    $pen.Dispose()
+}
+
+function Draw-Oval {
+    param(
+        [System.Drawing.Graphics]$G,
+        [int]$X,
+        [int]$Y,
+        [int]$W,
+        [int]$H,
+        [string]$Text,
+        [string]$Fill = "#ffffff",
+        [string]$Border = "#173f8a",
+        [int]$FontSize = 13
+    )
+
+    $rect = New-Object System.Drawing.Rectangle $X, $Y, $W, $H
+    $textRect = New-Object System.Drawing.RectangleF ([float]$X), ([float]$Y), ([float]$W), ([float]$H)
+    $brush = New-Object System.Drawing.SolidBrush (Color $Fill)
+    $pen = New-Object System.Drawing.Pen (Color $Border), 3
+    $G.FillEllipse($brush, $rect)
+    $G.DrawEllipse($pen, $rect)
+
+    $font = New-Object System.Drawing.Font "Segoe UI", $FontSize, ([System.Drawing.FontStyle]::Bold)
+    $textBrush = New-Object System.Drawing.SolidBrush (Color "#1f2937")
+    $format = New-Object System.Drawing.StringFormat
+    $format.Alignment = [System.Drawing.StringAlignment]::Center
+    $format.LineAlignment = [System.Drawing.StringAlignment]::Center
+    $G.DrawString($Text, $font, $textBrush, $textRect, $format)
+
+    $format.Dispose()
+    $textBrush.Dispose()
+    $font.Dispose()
+    $pen.Dispose()
+    $brush.Dispose()
+}
+
+function Draw-Boundary {
+    param(
+        [System.Drawing.Graphics]$G,
+        [int]$X,
+        [int]$Y,
+        [int]$W,
+        [int]$H,
+        [string]$Text
+    )
+
+    $rect = New-Object System.Drawing.Rectangle $X, $Y, $W, $H
+    $pen = New-Object System.Drawing.Pen (Color "#173f8a"), 3
+    $G.DrawRectangle($pen, $rect)
+
+    $font = New-Object System.Drawing.Font "Segoe UI", 19, ([System.Drawing.FontStyle]::Bold)
+    $textBrush = New-Object System.Drawing.SolidBrush (Color "#173f8a")
+    $G.DrawString($Text, $font, $textBrush, ($X + 25), ($Y + 18))
+
+    $textBrush.Dispose()
+    $font.Dispose()
+    $pen.Dispose()
+}
+
 function Save-Diagram {
     param([System.Drawing.Bitmap]$Bitmap, [System.Drawing.Graphics]$Graphics, [string]$FileName)
     $path = Join-Path $outDir $FileName
@@ -225,8 +297,75 @@ function New-DetailedEveArchitecture {
     Save-Diagram $bmp $g "proposed_eve_system_architecture_detailed.png"
 }
 
+function New-UseCaseDiagram {
+    $items = New-Canvas "Use Case Diagram of the Proposed Eve System"
+    $bmp = $items[0]
+    $g = $items[1]
+
+    Draw-Box $g 100 125 240 70 "Guest /`nCandidate" "#eaf2ff" "#173f8a" 14
+    Draw-Box $g 465 125 240 70 "Student" "#eaf2ff" "#173f8a" 15
+    Draw-Box $g 830 125 240 70 "Lecturer" "#eaf2ff" "#173f8a" 15
+    Draw-Box $g 1195 125 240 70 "Administrator" "#eaf2ff" "#173f8a" 14
+
+    Draw-Boundary $g 60 230 1480 620 "EVE AI SYSTEM"
+
+    $columns = @(
+        @{
+            ActorCenter = @(220, 195)
+            Cases = @(
+                @(110, 300, "Ask public`nESUI questions"),
+                @(110, 415, "View admission`nguidance"),
+                @(110, 530, "Estimate admission`nreadiness")
+            )
+        },
+        @{
+            ActorCenter = @(585, 195)
+            Cases = @(
+                @(455, 285, "Ask academic`nquestions"),
+                @(455, 390, "View learning`nprogress"),
+                @(455, 495, "Start guided`nlearning session"),
+                @(455, 600, "Upload notes for`nAsk Eve"),
+                @(455, 705, "View study`nrecommendations")
+            )
+        },
+        @{
+            ActorCenter = @(950, 195)
+            Cases = @(
+                @(820, 330, "View course`nanalytics"),
+                @(820, 470, "Review peer`nnotes"),
+                @(820, 610, "View student`nlearning trends")
+            )
+        },
+        @{
+            ActorCenter = @(1315, 195)
+            Cases = @(
+                @(1185, 330, "Manage knowledge`nbase"),
+                @(1185, 470, "Approve or reject`nshared content"),
+                @(1185, 610, "View governance`nand audit records")
+            )
+        }
+    )
+
+    foreach ($column in $columns) {
+        $actorX = $column.ActorCenter[0]
+        $actorY = $column.ActorCenter[1]
+        foreach ($case in $column.Cases) {
+            Draw-Line $g $actorX $actorY ($case[0] + 130) ($case[1] + 37) "#c0c7d2"
+        }
+    }
+
+    foreach ($column in $columns) {
+        foreach ($case in $column.Cases) {
+            Draw-Oval $g $case[0] $case[1] 260 75 $case[2] "#f8fafc" "#173f8a" 12
+        }
+    }
+
+    Save-Diagram $bmp $g "use_case_diagram.png"
+}
+
 New-ExistingArchitecture
 New-ProposedArchitecture
 New-DataFlowDiagram
 New-DatabaseErd
 New-DetailedEveArchitecture
+New-UseCaseDiagram
