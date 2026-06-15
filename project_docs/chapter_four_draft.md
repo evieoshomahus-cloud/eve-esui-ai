@@ -58,7 +58,7 @@ Major backend files include:
 
 ### 4.3.2 Frontend Implementation
 
-The frontend was implemented using Flutter. It provides a responsive interface for guest, student, and lecturer users. The interface includes login mode selection, chat, tools, admissions estimator, student learning progress dashboard, guided learning session screen, lecturer workbench, and profile/account switcher.
+The frontend was implemented using Flutter. It provides a responsive interface for guest, student, and lecturer users. The interface includes login mode selection, chat, tools, admissions estimator, student learning progress dashboard, guided learning session screen, upload-assisted Ask Eve, peer-note contribution, lecturer workbench, knowledge governance views, and profile/account switcher.
 
 Major frontend files include:
 
@@ -110,21 +110,66 @@ Lecturers can view analytics only for their assigned courses. The lecturer workb
 
 For example, `lec-mth-002` can view `MTH 211` insights because the course is assigned to that lecturer.
 
+### 4.3.8 Upload-Assisted Ask Eve Implementation
+
+The Ask Eve module supports file-assisted academic questions. A student can upload a supported note file and ask Eve to summarize, explain, or turn the content into a study plan. This makes the assistant more useful for personalized learning because it can respond to a student's own learning material instead of only answering from general knowledge.
+
+For the prototype, uploaded content is treated as private session context. Eve uses it to support the student's current question, but it is not automatically published to the shared knowledge base. This design prevents unverified notes from becoming official institutional content.
+
+### 4.3.9 Moderated Peer Notes and Knowledge Governance Implementation
+
+The project also includes a moderated peer-note workflow. Students can submit helpful course notes, summaries, and explanations, but those notes do not become shared learning material until they are reviewed. Lecturers can review submissions only for courses assigned to them, while administrators can review wider institutional knowledge entries.
+
+The moderation process supports three outcomes:
+
+- approve useful and accurate notes;
+- request revision when a note needs correction;
+- reject unsuitable or inaccurate notes.
+
+Approved peer notes can be retrieved as learning support, while pending and rejected notes remain separate from the official knowledge base. This protects students from misinformation and supports academic governance.
+
 ## 4.4 System Interface / Screenshots
 
-The following screenshots should be captured from the running system for the final report:
+The following screenshots were captured from the running system and are included as implementation evidence:
 
 | Figure | Screenshot | Description |
 | --- | --- | --- |
 | Figure 4.1 | Entry screen | Shows guest, student, and lecturer entry modes. |
-| Figure 4.2 | Student home screen | Shows personalized student welcome and quick actions. |
-| Figure 4.3 | Chat interface | Shows Eve answering a student question in OpenAI mode. |
-| Figure 4.4 | Student learning progress dashboard | Shows overall progress, weak topics, completed sessions, and quiz average. |
-| Figure 4.5 | Guided learning session screen | Shows concept explanation, worked example, and quiz answer box. |
-| Figure 4.6 | Feedback history screen | Shows scores and feedback after student answers. |
-| Figure 4.7 | Lecturer teaching workbench | Shows assigned-course saved learning trends. |
-| Figure 4.8 | Admission readiness estimator | Shows JAMB and O-Level readiness guidance. |
-| Figure 4.9 | Profile/account switcher | Shows role-based demo accounts. |
+| Figure 4.2 | Personalized student dashboard | Shows today's focus, weak topic, progress, and peer-note activity. |
+| Figure 4.3 | Mobile responsive dashboard | Shows the same student dashboard adapted to a phone screen. |
+| Figure 4.4 | Ask Eve conversation | Shows Eve giving personalized academic guidance. |
+| Figure 4.5 | Upload-assisted Ask Eve | Shows Eve using an uploaded CSC note to support a student's question. |
+| Figure 4.6 | Guided learning session | Shows concept explanation and practice question support. |
+| Figure 4.7 | Peer-note submission | Shows the student contribution form. |
+| Figure 4.8 | Lecturer peer-note review | Shows approve, reject, and revise moderation actions. |
+| Figure 4.9 | Lecturer analytics | Shows assigned-course analytics and intervention insight. |
+| Figure 4.10 | Admission readiness estimator | Shows public guidance for Computer Science admission readiness. |
+| Figure 4.11 | Admin knowledge library | Shows curated institutional knowledge entries and governance controls. |
+| Figure 4.12 | Backend health endpoint | Shows the deployed backend running in OpenAI Responses API mode. |
+
+![Figure 4.1: Eve role selection and login screen.](screenshots/login_screen.png)
+
+![Figure 4.2: Personalized student dashboard showing today's focus, weak topic, progress, and peer-note activity.](screenshots/student_personalized_home_desktop.png)
+
+![Figure 4.3: Mobile responsive view of the personalized student dashboard.](screenshots/student_personalized_home_mobile.jpeg)
+
+![Figure 4.4: Ask Eve conversation showing personalized academic guidance.](screenshots/ask_eve_conversation.png)
+
+![Figure 4.5: Upload-assisted Ask Eve conversation using a CSC 201 note.](screenshots/upload_assisted_ask_eve.png)
+
+![Figure 4.6: Guided CSC 201 learning session with concept explanation and practice question.](screenshots/learning_session_page.png)
+
+![Figure 4.7: Student peer-note submission form.](screenshots/peer_notes_submission_form.png)
+
+![Figure 4.8: Lecturer peer-note review queue with approve, reject, and revise actions.](screenshots/lecturer_peer_note_review.png)
+
+![Figure 4.9: Lecturer workbench with assigned-course analytics.](screenshots/lecturer_analytics_page.png)
+
+![Figure 4.10: Admission readiness estimator result for Computer Science.](screenshots/admission_readiness_result.png)
+
+![Figure 4.11: Admin curated knowledge library with approved entries.](screenshots/admin_knowledge_library.png)
+
+![Figure 4.12: Backend health endpoint showing OpenAI Responses API mode.](screenshots/openai_responses.png)
 
 ## 4.5 Test Plan
 
@@ -141,6 +186,9 @@ The system was tested using functional tests, API endpoint tests, UI tests, and 
 | Lecturer insight test | Confirm assigned-course analytics and saved learning trends. |
 | Chat test | Confirm natural responses and role-aware answers. |
 | Guardrail test | Confirm prompt-injection attempts are blocked. |
+| Upload-assisted chat test | Confirm Eve can use an uploaded note as private question context. |
+| Peer-note moderation test | Confirm student notes require review before shared use. |
+| Knowledge governance test | Confirm admin knowledge entries and audit labels are available. |
 
 ## 4.6 Test Cases and Test Results
 
@@ -221,6 +269,27 @@ The response includes total sessions, completed sessions, tracked student count,
 | Student tries to access another student's private record | Request should be denied | Passed |
 | Lecturer requests unassigned course analytics | Access should be denied | Passed |
 
+### 4.6.10 Upload-Assisted Ask Eve Test
+
+| Test | Expected Result | Actual Result |
+| --- | --- | --- |
+| Upload a CSC note and ask Eve for explanation | Eve should use the uploaded note as context for the current question | Passed |
+
+### 4.6.11 Peer-Note Moderation Test
+
+| Test | Expected Result | Actual Result |
+| --- | --- | --- |
+| Student submits course note | Note should appear as pending review | Passed |
+| Lecturer reviews assigned-course note | Lecturer should approve, reject, or request revision | Passed |
+| Approved note is retrieved by Eve | Approved note should be available as reviewed peer learning context | Passed |
+
+### 4.6.12 Knowledge Governance Test
+
+| Test | Expected Result | Actual Result |
+| --- | --- | --- |
+| Admin adds knowledge entry | Entry should be saved with governance metadata | Passed |
+| Ask Eve about knowledge gaps | Eve should explain uncertainty and avoid unsupported claims | Passed |
+
 ## 4.7 Model Training and Evaluation
 
 The prototype does not train a new large language model from scratch. Instead, it uses:
@@ -249,6 +318,9 @@ The implemented prototype successfully demonstrated the main project goal. It wa
 - store learning progress in SQLite;
 - show saved progress history;
 - provide lecturer course-level learning trends;
+- support upload-assisted questions using student-provided notes;
+- allow moderated peer-note contribution and lecturer review;
+- provide admin knowledge governance for curated information;
 - generate natural AI responses when OpenAI mode is configured;
 - block unsafe or unauthorized requests.
 
@@ -270,4 +342,4 @@ The prototype is limited by its use of sample data. However, its architecture ca
 
 ## 4.11 Summary of the Chapter
 
-This chapter presented the implementation and testing of Eve. It described the development environment, backend and frontend modules, interface screens, test plan, test results, AI evaluation approach, and discussion of results. The implementation confirms that the project topic was achieved through a working system for personalized learning, academic progress tracking, guided learning sessions, and lecturer analytics.
+This chapter presented the implementation and testing of Eve. It described the development environment, backend and frontend modules, interface screens, test plan, test results, AI evaluation approach, and discussion of results. The implementation confirms that the project topic was achieved through a working system for personalized learning, academic progress tracking, guided learning sessions, upload-assisted learning support, moderated peer notes, knowledge governance, and lecturer analytics.

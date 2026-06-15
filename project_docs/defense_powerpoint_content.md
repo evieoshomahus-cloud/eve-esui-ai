@@ -181,6 +181,10 @@ Implemented modules:
 - Guided learning session mode.
 - SQLite progress history.
 - Lecturer teaching workbench.
+- Upload-assisted Ask Eve questions.
+- Moderated student peer notes.
+- Lecturer peer-note review workflow.
+- Admin knowledge governance tools.
 - Prompt-injection guardrails.
 - OpenAI response generation with local fallback.
 
@@ -195,7 +199,9 @@ Implemented modules:
 7. Added guided learning sessions and answer scoring.
 8. Added SQLite persistence.
 9. Added lecturer saved-session analytics.
-10. Tested backend, UI, and security behavior.
+10. Added upload-assisted Ask Eve support.
+11. Added moderated peer-note and knowledge-governance workflow.
+12. Tested backend, UI, and security behavior.
 
 ## Slide 16: Programming Language and Tools Used
 
@@ -207,18 +213,20 @@ Implemented modules:
 - JSON: prototype knowledge and academic records.
 - OpenAI Responses API: optional natural language generation.
 - PowerShell: local development and testing commands.
+- Render: public web deployment for user review.
 
 ## Slide 17: System Interface / Screenshots
 
 Screenshots to show:
 
-- Entry screen.
-- Student learning progress dashboard.
+- Login and role selection screen.
+- Personalized student dashboard on desktop and mobile.
+- Ask Eve conversation and upload-assisted note response.
 - Guided learning session screen.
-- Feedback history and quiz score.
-- Lecturer teaching workbench.
+- Peer-note submission and lecturer review queue.
+- Lecturer assigned-course analytics.
 - Admission readiness estimator.
-- Chat response with OpenAI mode.
+- Admin knowledge library and backend OpenAI health endpoint.
 
 ## Slide 18: Discussion of Results / Evaluation
 
@@ -232,6 +240,9 @@ Evaluation results:
 - Progress history endpoint returned saved SQLite history.
 - Lecturer endpoint returned assigned-course trends.
 - Chat handled casual and academic prompts naturally.
+- Upload-assisted Ask Eve used a CSC note as private context.
+- Peer-note submission stayed pending until lecturer review.
+- Approved peer note became available as reviewed learning support.
 - Guardrails blocked unsafe requests.
 
 ## Slide 19: Conclusion and Recommendations
@@ -240,7 +251,7 @@ Conclusion:
 
 - The project successfully implemented an AI system for personalized learning and academic progress tracking.
 - Eve supports students, lecturers, and guests through role-based modules.
-- The system demonstrates RAG, guardrails, guided learning, saved progress, and lecturer analytics.
+- The system demonstrates RAG, guardrails, guided learning, saved progress, uploads, moderated peer notes, knowledge governance, and lecturer analytics.
 
 Recommendations:
 
@@ -248,6 +259,7 @@ Recommendations:
 - Connect to Canvas LMS and approved course materials.
 - Use managed database storage in production.
 - Add admin content-approval dashboard.
+- Connect student records, lecturer accounts, and approved course materials through official APIs.
 - Expand datasets across departments.
 
 ## Slide 20: Selected References

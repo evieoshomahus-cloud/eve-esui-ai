@@ -56,6 +56,9 @@ The major modules are:
 - quiz scoring and feedback;
 - SQLite progress persistence;
 - lecturer assigned-course analytics;
+- upload-assisted Ask Eve questions;
+- moderated peer-note submissions;
+- lecturer and admin review workflow;
 - defense-ready audit and explainability labels.
 
 ## 3.5 System Requirements
@@ -75,6 +78,10 @@ The system should:
 - score student quiz answers and provide feedback;
 - persist learning sessions, answers, scores, and completion status;
 - show saved student progress history;
+- allow students to upload notes for private question context;
+- allow students to submit course notes for review;
+- allow lecturers to review peer notes only for assigned courses;
+- allow administrators to manage wider knowledge-base entries;
 - provide lecturers with analytics for assigned courses only;
 - show lecturer trends from saved learning sessions;
 - block prompt-injection attempts and unauthorized private-record requests;
@@ -148,14 +155,16 @@ flowchart LR
     Auth --> Academic["Academic Services"]
     Academic --> Records["Sample Academic Records"]
     Academic --> SQLite["SQLite Progress Database"]
+    Academic --> PeerNotes["Moderated Peer Notes"]
     RAG --> Knowledge["Curated ESUI Knowledge Base"]
+    PeerNotes --> RAG
     API --> OpenAI["Optional OpenAI Responses API"]
     API --> Flutter
 ```
 
 ### 3.8.1 Backend Layer
 
-The backend is implemented with FastAPI. It exposes REST endpoints for users, chat, admissions estimation, student learning profile, learning sessions, progress history, and lecturer insights.
+The backend is implemented with FastAPI. It exposes REST endpoints for users, chat, admissions estimation, student learning profile, learning sessions, progress history, lecturer insights, file-assisted questions, peer-note submission, and moderation review.
 
 ### 3.8.2 AI Orchestration Layer
 
@@ -163,7 +172,7 @@ The AI layer detects user intent, checks authorization, retrieves relevant knowl
 
 ### 3.8.3 Data Layer
 
-The prototype uses JSON files for sample users, sample academic records, and curated knowledge. It uses SQLite for saved learning sessions and progress tracking.
+The prototype uses JSON files for sample users, sample academic records, and curated knowledge. It uses SQLite for saved learning sessions, progress tracking, and moderated peer-note records.
 
 ## 3.9 Use Case / UML Diagrams
 
@@ -186,10 +195,13 @@ flowchart TB
     Student --> UC7["Submit quiz answers"]
     Student --> UC8["View saved progress history"]
     Student --> UC9["Ask fee or timetable guidance"]
+    Student --> UC10["Upload private notes for Ask Eve"]
+    Student --> UC11["Submit peer learning notes"]
 
-    Lecturer --> UC10["View assigned-course analytics"]
-    Lecturer --> UC11["View saved session trends"]
-    Lecturer --> UC12["Request teaching interventions"]
+    Lecturer --> UC12["View assigned-course analytics"]
+    Lecturer --> UC13["View saved session trends"]
+    Lecturer --> UC14["Request teaching interventions"]
+    Lecturer --> UC15["Review assigned-course peer notes"]
 
     UC1 --> Eve
     UC2 --> Eve
@@ -203,6 +215,9 @@ flowchart TB
     UC10 --> Eve
     UC11 --> Eve
     UC12 --> Eve
+    UC13 --> Eve
+    UC14 --> Eve
+    UC15 --> Eve
 ```
 
 ### 3.9.2 Data Flow Diagram
@@ -216,7 +231,9 @@ flowchart LR
     Intent --> Retrieval["Knowledge Retrieval"]
     Intent --> AcademicData["Academic Data Processing"]
     AcademicData --> Database["SQLite Progress Storage"]
+    AcademicData --> PeerNotes["Moderated Peer Notes"]
     Retrieval --> Response["AI Response Generation"]
+    PeerNotes --> Retrieval
     AcademicData --> Response
     Response --> Client
     Client --> User
@@ -244,13 +261,14 @@ sequenceDiagram
 
 ## 3.10 Database Design
 
-SQLite is used for local persistence of learning-session history. This makes the prototype suitable for defense because progress survives backend restarts without requiring an external database server.
+SQLite is used for local persistence of learning-session history and moderated peer-note activity. This makes the prototype suitable for defense because progress and contribution records survive backend restarts without requiring an external database server.
 
 ### 3.10.1 Entity Relationship Diagram
 
 ```mermaid
 erDiagram
     LEARNING_SESSIONS ||--o{ LEARNING_ANSWERS : contains
+    PEER_NOTES ||--o{ PEER_NOTE_REVIEWS : receives
 
     LEARNING_SESSIONS {
         text session_id PK
@@ -279,6 +297,26 @@ erDiagram
         text ideal_answer
         text created_at
     }
+
+    PEER_NOTES {
+        text note_id PK
+        text user_id
+        text course_code
+        text title
+        text content
+        text status
+        text created_at
+        text reviewed_at
+    }
+
+    PEER_NOTE_REVIEWS {
+        integer id PK
+        text note_id FK
+        text reviewer_id
+        text action
+        text comment
+        text created_at
+    }
 ```
 
 ### 3.10.2 Table Description
@@ -287,8 +325,10 @@ erDiagram
 | --- | --- |
 | `learning_sessions` | Stores each guided learning session, course, topic, progress counter, timestamps, and summary. |
 | `learning_answers` | Stores student submitted answers, scores, feedback, ideal answer direction, and timestamps. |
+| `peer_notes` | Stores student course-note submissions and moderation status. |
+| `peer_note_reviews` | Stores lecturer or admin review actions for submitted notes. |
 
-The JSON sample records store demo users, student profiles, lecturer profiles, and course analytics. The SQLite database stores runtime progress history.
+The JSON sample records store demo users, student profiles, lecturer profiles, and course analytics. The SQLite database stores runtime progress history and peer-note moderation records.
 
 ## 3.11 Algorithm / Model Design
 

@@ -64,7 +64,7 @@ I acknowledge God Almighty for wisdom, strength, and protection throughout this 
 
 # ABSTRACT
 
-This project focused on the design and implementation of an AI system for personalized learning and academic progress tracking. The system, named Eve, was developed as a role-aware academic companion for Edo State University Iyamho. It supports guest users, students, and lecturers through a responsive Flutter interface connected to a Python FastAPI backend. The system provides admission guidance, student learning progress tracking, guided learning sessions, quiz scoring, saved progress history, lecturer assigned-course analytics, Retrieval-Augmented Generation, prompt-injection guardrails, and optional OpenAI response generation. SQLite was used to persist learning sessions, answers, scores, feedback, and completion status. The system was evaluated using backend compilation, Flutter analysis, widget tests, API endpoint tests, learning-session persistence checks, lecturer analytics checks, and security behavior tests. The results showed that Eve can support personalized academic guidance, track student progress over time, and provide lecturers with course-level learning evidence while enforcing role-based privacy controls.
+This project focused on the design and implementation of an AI system for personalized learning and academic progress tracking. The system, named Eve, was developed as a role-aware academic companion for Edo State University Iyamho. It supports guest users, students, and lecturers through a responsive Flutter interface connected to a Python FastAPI backend. The system provides admission guidance, student learning progress tracking, guided learning sessions, quiz scoring, saved progress history, upload-assisted questions, moderated peer notes, lecturer assigned-course analytics, Retrieval-Augmented Generation, prompt-injection guardrails, knowledge governance, and optional OpenAI response generation. SQLite was used to persist learning sessions, answers, scores, feedback, completion status, and peer-note review records. The system was evaluated using backend compilation, Flutter analysis, widget tests, API endpoint tests, learning-session persistence checks, lecturer analytics checks, moderation checks, and security behavior tests. The results showed that Eve can support personalized academic guidance, track student progress over time, manage reviewed student contributions, and provide lecturers with course-level learning evidence while enforcing role-based privacy controls.
 
 # TABLE OF CONTENTS
 
@@ -74,21 +74,27 @@ Use Microsoft Word to update the automatic table of contents after final formatt
 
 Figure 4.1 Entry screen
 
-Figure 4.2 Student home screen
+Figure 4.2 Personalized student dashboard
 
-Figure 4.3 Chat interface
+Figure 4.3 Mobile responsive dashboard
 
-Figure 4.4 Student learning progress dashboard
+Figure 4.4 Ask Eve conversation
 
-Figure 4.5 Guided learning session screen
+Figure 4.5 Upload-assisted Ask Eve
 
-Figure 4.6 Feedback history screen
+Figure 4.6 Guided learning session
 
-Figure 4.7 Lecturer teaching workbench
+Figure 4.7 Peer-note submission
 
-Figure 4.8 Admission readiness estimator
+Figure 4.8 Lecturer peer-note review
 
-Figure 4.9 Profile/account switcher
+Figure 4.9 Lecturer analytics
+
+Figure 4.10 Admission readiness estimator
+
+Figure 4.11 Admin knowledge library
+
+Figure 4.12 Backend health endpoint
 
 
 # Chapter One Draft
@@ -402,6 +408,9 @@ The major modules are:
 - quiz scoring and feedback;
 - SQLite progress persistence;
 - lecturer assigned-course analytics;
+- upload-assisted Ask Eve questions;
+- moderated peer-note submissions;
+- lecturer and admin review workflow;
 - defense-ready audit and explainability labels.
 
 ## 3.5 System Requirements
@@ -421,6 +430,10 @@ The system should:
 - score student quiz answers and provide feedback;
 - persist learning sessions, answers, scores, and completion status;
 - show saved student progress history;
+- allow students to upload notes for private question context;
+- allow students to submit course notes for review;
+- allow lecturers to review peer notes only for assigned courses;
+- allow administrators to manage wider knowledge-base entries;
 - provide lecturers with analytics for assigned courses only;
 - show lecturer trends from saved learning sessions;
 - block prompt-injection attempts and unauthorized private-record requests;
@@ -494,14 +507,16 @@ flowchart LR
     Auth --> Academic["Academic Services"]
     Academic --> Records["Sample Academic Records"]
     Academic --> SQLite["SQLite Progress Database"]
+    Academic --> PeerNotes["Moderated Peer Notes"]
     RAG --> Knowledge["Curated ESUI Knowledge Base"]
+    PeerNotes --> RAG
     API --> OpenAI["Optional OpenAI Responses API"]
     API --> Flutter
 ```
 
 ### 3.8.1 Backend Layer
 
-The backend is implemented with FastAPI. It exposes REST endpoints for users, chat, admissions estimation, student learning profile, learning sessions, progress history, and lecturer insights.
+The backend is implemented with FastAPI. It exposes REST endpoints for users, chat, admissions estimation, student learning profile, learning sessions, progress history, lecturer insights, file-assisted questions, peer-note submission, and moderation review.
 
 ### 3.8.2 AI Orchestration Layer
 
@@ -509,7 +524,7 @@ The AI layer detects user intent, checks authorization, retrieves relevant knowl
 
 ### 3.8.3 Data Layer
 
-The prototype uses JSON files for sample users, sample academic records, and curated knowledge. It uses SQLite for saved learning sessions and progress tracking.
+The prototype uses JSON files for sample users, sample academic records, and curated knowledge. It uses SQLite for saved learning sessions, progress tracking, and moderated peer-note records.
 
 ## 3.9 Use Case / UML Diagrams
 
@@ -532,10 +547,13 @@ flowchart TB
     Student --> UC7["Submit quiz answers"]
     Student --> UC8["View saved progress history"]
     Student --> UC9["Ask fee or timetable guidance"]
+    Student --> UC10["Upload private notes for Ask Eve"]
+    Student --> UC11["Submit peer learning notes"]
 
-    Lecturer --> UC10["View assigned-course analytics"]
-    Lecturer --> UC11["View saved session trends"]
-    Lecturer --> UC12["Request teaching interventions"]
+    Lecturer --> UC12["View assigned-course analytics"]
+    Lecturer --> UC13["View saved session trends"]
+    Lecturer --> UC14["Request teaching interventions"]
+    Lecturer --> UC15["Review assigned-course peer notes"]
 
     UC1 --> Eve
     UC2 --> Eve
@@ -549,6 +567,9 @@ flowchart TB
     UC10 --> Eve
     UC11 --> Eve
     UC12 --> Eve
+    UC13 --> Eve
+    UC14 --> Eve
+    UC15 --> Eve
 ```
 
 ### 3.9.2 Data Flow Diagram
@@ -562,7 +583,9 @@ flowchart LR
     Intent --> Retrieval["Knowledge Retrieval"]
     Intent --> AcademicData["Academic Data Processing"]
     AcademicData --> Database["SQLite Progress Storage"]
+    AcademicData --> PeerNotes["Moderated Peer Notes"]
     Retrieval --> Response["AI Response Generation"]
+    PeerNotes --> Retrieval
     AcademicData --> Response
     Response --> Client
     Client --> User
@@ -590,13 +613,14 @@ sequenceDiagram
 
 ## 3.10 Database Design
 
-SQLite is used for local persistence of learning-session history. This makes the prototype suitable for defense because progress survives backend restarts without requiring an external database server.
+SQLite is used for local persistence of learning-session history and moderated peer-note activity. This makes the prototype suitable for defense because progress and contribution records survive backend restarts without requiring an external database server.
 
 ### 3.10.1 Entity Relationship Diagram
 
 ```mermaid
 erDiagram
     LEARNING_SESSIONS ||--o{ LEARNING_ANSWERS : contains
+    PEER_NOTES ||--o{ PEER_NOTE_REVIEWS : receives
 
     LEARNING_SESSIONS {
         text session_id PK
@@ -625,6 +649,26 @@ erDiagram
         text ideal_answer
         text created_at
     }
+
+    PEER_NOTES {
+        text note_id PK
+        text user_id
+        text course_code
+        text title
+        text content
+        text status
+        text created_at
+        text reviewed_at
+    }
+
+    PEER_NOTE_REVIEWS {
+        integer id PK
+        text note_id FK
+        text reviewer_id
+        text action
+        text comment
+        text created_at
+    }
 ```
 
 ### 3.10.2 Table Description
@@ -633,8 +677,10 @@ erDiagram
 | --- | --- |
 | `learning_sessions` | Stores each guided learning session, course, topic, progress counter, timestamps, and summary. |
 | `learning_answers` | Stores student submitted answers, scores, feedback, ideal answer direction, and timestamps. |
+| `peer_notes` | Stores student course-note submissions and moderation status. |
+| `peer_note_reviews` | Stores lecturer or admin review actions for submitted notes. |
 
-The JSON sample records store demo users, student profiles, lecturer profiles, and course analytics. The SQLite database stores runtime progress history.
+The JSON sample records store demo users, student profiles, lecturer profiles, and course analytics. The SQLite database stores runtime progress history and peer-note moderation records.
 
 ## 3.11 Algorithm / Model Design
 
@@ -772,7 +818,7 @@ Major backend files include:
 
 ### 4.3.2 Frontend Implementation
 
-The frontend was implemented using Flutter. It provides a responsive interface for guest, student, and lecturer users. The interface includes login mode selection, chat, tools, admissions estimator, student learning progress dashboard, guided learning session screen, lecturer workbench, and profile/account switcher.
+The frontend was implemented using Flutter. It provides a responsive interface for guest, student, and lecturer users. The interface includes login mode selection, chat, tools, admissions estimator, student learning progress dashboard, guided learning session screen, upload-assisted Ask Eve, peer-note contribution, lecturer workbench, knowledge governance views, and profile/account switcher.
 
 Major frontend files include:
 
@@ -824,21 +870,66 @@ Lecturers can view analytics only for their assigned courses. The lecturer workb
 
 For example, `lec-mth-002` can view `MTH 211` insights because the course is assigned to that lecturer.
 
+### 4.3.8 Upload-Assisted Ask Eve Implementation
+
+The Ask Eve module supports file-assisted academic questions. A student can upload a supported note file and ask Eve to summarize, explain, or turn the content into a study plan. This makes the assistant more useful for personalized learning because it can respond to a student's own learning material instead of only answering from general knowledge.
+
+For the prototype, uploaded content is treated as private session context. Eve uses it to support the student's current question, but it is not automatically published to the shared knowledge base. This design prevents unverified notes from becoming official institutional content.
+
+### 4.3.9 Moderated Peer Notes and Knowledge Governance Implementation
+
+The project also includes a moderated peer-note workflow. Students can submit helpful course notes, summaries, and explanations, but those notes do not become shared learning material until they are reviewed. Lecturers can review submissions only for courses assigned to them, while administrators can review wider institutional knowledge entries.
+
+The moderation process supports three outcomes:
+
+- approve useful and accurate notes;
+- request revision when a note needs correction;
+- reject unsuitable or inaccurate notes.
+
+Approved peer notes can be retrieved as learning support, while pending and rejected notes remain separate from the official knowledge base. This protects students from misinformation and supports academic governance.
+
 ## 4.4 System Interface / Screenshots
 
-The following screenshots should be captured from the running system for the final report:
+The following screenshots were captured from the running system and are included as implementation evidence:
 
 | Figure | Screenshot | Description |
 | --- | --- | --- |
 | Figure 4.1 | Entry screen | Shows guest, student, and lecturer entry modes. |
-| Figure 4.2 | Student home screen | Shows personalized student welcome and quick actions. |
-| Figure 4.3 | Chat interface | Shows Eve answering a student question in OpenAI mode. |
-| Figure 4.4 | Student learning progress dashboard | Shows overall progress, weak topics, completed sessions, and quiz average. |
-| Figure 4.5 | Guided learning session screen | Shows concept explanation, worked example, and quiz answer box. |
-| Figure 4.6 | Feedback history screen | Shows scores and feedback after student answers. |
-| Figure 4.7 | Lecturer teaching workbench | Shows assigned-course saved learning trends. |
-| Figure 4.8 | Admission readiness estimator | Shows JAMB and O-Level readiness guidance. |
-| Figure 4.9 | Profile/account switcher | Shows role-based demo accounts. |
+| Figure 4.2 | Personalized student dashboard | Shows today's focus, weak topic, progress, and peer-note activity. |
+| Figure 4.3 | Mobile responsive dashboard | Shows the same student dashboard adapted to a phone screen. |
+| Figure 4.4 | Ask Eve conversation | Shows Eve giving personalized academic guidance. |
+| Figure 4.5 | Upload-assisted Ask Eve | Shows Eve using an uploaded CSC note to support a student's question. |
+| Figure 4.6 | Guided learning session | Shows concept explanation and practice question support. |
+| Figure 4.7 | Peer-note submission | Shows the student contribution form. |
+| Figure 4.8 | Lecturer peer-note review | Shows approve, reject, and revise moderation actions. |
+| Figure 4.9 | Lecturer analytics | Shows assigned-course analytics and intervention insight. |
+| Figure 4.10 | Admission readiness estimator | Shows public guidance for Computer Science admission readiness. |
+| Figure 4.11 | Admin knowledge library | Shows curated institutional knowledge entries and governance controls. |
+| Figure 4.12 | Backend health endpoint | Shows the deployed backend running in OpenAI Responses API mode. |
+
+![Figure 4.1: Eve role selection and login screen.](screenshots/login_screen.png)
+
+![Figure 4.2: Personalized student dashboard showing today's focus, weak topic, progress, and peer-note activity.](screenshots/student_personalized_home_desktop.png)
+
+![Figure 4.3: Mobile responsive view of the personalized student dashboard.](screenshots/student_personalized_home_mobile.jpeg)
+
+![Figure 4.4: Ask Eve conversation showing personalized academic guidance.](screenshots/ask_eve_conversation.png)
+
+![Figure 4.5: Upload-assisted Ask Eve conversation using a CSC 201 note.](screenshots/upload_assisted_ask_eve.png)
+
+![Figure 4.6: Guided CSC 201 learning session with concept explanation and practice question.](screenshots/learning_session_page.png)
+
+![Figure 4.7: Student peer-note submission form.](screenshots/peer_notes_submission_form.png)
+
+![Figure 4.8: Lecturer peer-note review queue with approve, reject, and revise actions.](screenshots/lecturer_peer_note_review.png)
+
+![Figure 4.9: Lecturer workbench with assigned-course analytics.](screenshots/lecturer_analytics_page.png)
+
+![Figure 4.10: Admission readiness estimator result for Computer Science.](screenshots/admission_readiness_result.png)
+
+![Figure 4.11: Admin curated knowledge library with approved entries.](screenshots/admin_knowledge_library.png)
+
+![Figure 4.12: Backend health endpoint showing OpenAI Responses API mode.](screenshots/openai_responses.png)
 
 ## 4.5 Test Plan
 
@@ -855,6 +946,9 @@ The system was tested using functional tests, API endpoint tests, UI tests, and 
 | Lecturer insight test | Confirm assigned-course analytics and saved learning trends. |
 | Chat test | Confirm natural responses and role-aware answers. |
 | Guardrail test | Confirm prompt-injection attempts are blocked. |
+| Upload-assisted chat test | Confirm Eve can use an uploaded note as private question context. |
+| Peer-note moderation test | Confirm student notes require review before shared use. |
+| Knowledge governance test | Confirm admin knowledge entries and audit labels are available. |
 
 ## 4.6 Test Cases and Test Results
 
@@ -935,6 +1029,27 @@ The response includes total sessions, completed sessions, tracked student count,
 | Student tries to access another student's private record | Request should be denied | Passed |
 | Lecturer requests unassigned course analytics | Access should be denied | Passed |
 
+### 4.6.10 Upload-Assisted Ask Eve Test
+
+| Test | Expected Result | Actual Result |
+| --- | --- | --- |
+| Upload a CSC note and ask Eve for explanation | Eve should use the uploaded note as context for the current question | Passed |
+
+### 4.6.11 Peer-Note Moderation Test
+
+| Test | Expected Result | Actual Result |
+| --- | --- | --- |
+| Student submits course note | Note should appear as pending review | Passed |
+| Lecturer reviews assigned-course note | Lecturer should approve, reject, or request revision | Passed |
+| Approved note is retrieved by Eve | Approved note should be available as reviewed peer learning context | Passed |
+
+### 4.6.12 Knowledge Governance Test
+
+| Test | Expected Result | Actual Result |
+| --- | --- | --- |
+| Admin adds knowledge entry | Entry should be saved with governance metadata | Passed |
+| Ask Eve about knowledge gaps | Eve should explain uncertainty and avoid unsupported claims | Passed |
+
 ## 4.7 Model Training and Evaluation
 
 The prototype does not train a new large language model from scratch. Instead, it uses:
@@ -963,6 +1078,9 @@ The implemented prototype successfully demonstrated the main project goal. It wa
 - store learning progress in SQLite;
 - show saved progress history;
 - provide lecturer course-level learning trends;
+- support upload-assisted questions using student-provided notes;
+- allow moderated peer-note contribution and lecturer review;
+- provide admin knowledge governance for curated information;
 - generate natural AI responses when OpenAI mode is configured;
 - block unsafe or unauthorized requests.
 
@@ -984,7 +1102,7 @@ The prototype is limited by its use of sample data. However, its architecture ca
 
 ## 4.11 Summary of the Chapter
 
-This chapter presented the implementation and testing of Eve. It described the development environment, backend and frontend modules, interface screens, test plan, test results, AI evaluation approach, and discussion of results. The implementation confirms that the project topic was achieved through a working system for personalized learning, academic progress tracking, guided learning sessions, and lecturer analytics.
+This chapter presented the implementation and testing of Eve. It described the development environment, backend and frontend modules, interface screens, test plan, test results, AI evaluation approach, and discussion of results. The implementation confirms that the project topic was achieved through a working system for personalized learning, academic progress tracking, guided learning sessions, upload-assisted learning support, moderated peer notes, knowledge governance, and lecturer analytics.
 
 # CHAPTER FIVE
 
@@ -1002,7 +1120,7 @@ The study focused on the design and implementation of an AI system that supports
 
 The project began with the problem that academic guidance, course support, admission information, and progress tracking are often spread across different sources. Students may need support with weak topics, study planning, mock tests, and academic improvement, while lecturers may need course-level insights for teaching intervention. Generic AI chatbots are not sufficient because they may lack institutional grounding, privacy controls, and role-based access.
 
-To address the problem, Eve was built with a Flutter frontend and a Python FastAPI backend. The backend includes RAG retrieval, prompt-injection guardrails, role-based access control, student learning-profile computation, guided learning sessions, quiz scoring, SQLite progress persistence, lecturer assigned-course analytics, admission readiness estimation, and optional OpenAI response generation.
+To address the problem, Eve was built with a Flutter frontend and a Python FastAPI backend. The backend includes RAG retrieval, prompt-injection guardrails, role-based access control, student learning-profile computation, guided learning sessions, quiz scoring, SQLite progress persistence, lecturer assigned-course analytics, admission readiness estimation, upload-assisted questions, moderated peer-note contribution, knowledge governance, and optional OpenAI response generation.
 
 The implemented system demonstrates that AI can be used as an institutional academic-support layer when combined with verified knowledge, structured academic data, saved progress history, and privacy-aware controls.
 
@@ -1022,6 +1140,9 @@ The project objectives were achieved as follows:
 | Provide student academic advising and mock assessment support | Eve supports course explanations, mock questions, guided sessions, scoring, and feedback. |
 | Provide lecturer analytics | Lecturers can view assigned-course analytics and saved learning-session trends. |
 | Include admission readiness guidance | The guest module includes a readiness estimator based on JAMB and O-Level details. |
+| Support student learning-material uploads | Students can upload notes for private Ask Eve context during a learning conversation. |
+| Support peer learning with moderation | Students can submit course notes, while lecturers or administrators review them before shared use. |
+| Support knowledge governance | Admin knowledge tools and audit-style labels help separate curated knowledge from unverified content. |
 | Evaluate the system | Backend, Flutter, API, learning-session, lecturer, and security tests were performed. |
 
 ## 5.4 Contributions to Knowledge/Practice
@@ -1033,6 +1154,8 @@ This project contributes to academic practice in the following ways:
 - It demonstrates the importance of role-based access control in academic AI systems.
 - It provides a model for saving learning-session history and using it as progress evidence.
 - It extends academic support beyond students by giving lecturers course-level learning trends.
+- It demonstrates a moderated peer-learning workflow where student contributions are reviewed before being reused.
+- It shows how uploaded notes can support a student's private learning question without polluting the shared knowledge base.
 - It shows how prompt-injection guardrails can be included in an educational AI prototype.
 - It provides a practical foundation for a future ESUI institutional AI platform.
 
@@ -1040,7 +1163,7 @@ This project contributes to academic practice in the following ways:
 
 The project successfully achieved its aim of designing and implementing an AI system for personalized learning and academic progress tracking. Eve provides a working prototype that supports guests, students, and lecturers through role-based AI assistance.
 
-The student module identifies weak topics, recommends study tasks, starts guided learning sessions, scores answers, provides feedback, and saves progress history. The lecturer module provides assigned-course analytics and uses saved learning-session data to suggest teaching interventions. The guest module supports admissions guidance and public inquiries. The system also includes RAG, OpenAI response generation, local fallback logic, prompt-injection guardrails, and SQLite persistence.
+The student module identifies weak topics, recommends study tasks, starts guided learning sessions, scores answers, provides feedback, saves progress history, and supports note-assisted questions. The lecturer module provides assigned-course analytics, uses saved learning-session data to suggest teaching interventions, and reviews peer notes for assigned courses. The guest module supports admissions guidance and public inquiries. The system also includes RAG, OpenAI response generation, local fallback logic, prompt-injection guardrails, knowledge governance, and SQLite persistence.
 
 The results show that Eve is more than a general chatbot. It is a structured academic-support system that combines AI conversation, institutional knowledge, academic records, learning analytics, and security controls.
 
@@ -1053,6 +1176,8 @@ The study has the following limitations:
 - The SQLite database is suitable for local demonstration but should be replaced with managed production storage.
 - The system does not yet connect to Canvas LMS, official payment systems, or student information systems.
 - The guided quiz scoring uses keyword-based logic and should be improved with richer assessment methods in production.
+- The peer-note workflow uses prototype moderation records and should be connected to official lecturer accounts before production use.
+- Uploaded files are used for demonstration and should be scanned, stored, and governed with stronger institutional controls in production.
 - OpenAI response quality depends on API availability and configuration.
 - The system has not yet been evaluated with a large group of real ESUI students and lecturers.
 
@@ -1066,6 +1191,7 @@ Based on the study, the following recommendations are made:
 - Student records should only be accessed through approved APIs and role-based permissions.
 - Lecturers should be given analytics only for assigned courses.
 - Course materials should be added through lecturer-approved LMS integration.
+- Peer-learning submissions should remain hidden from general use until approved by authorized lecturers or administrators.
 - AI outputs should include source grounding, uncertainty handling, and audit logs.
 - The system should be tested with real users before deployment.
 

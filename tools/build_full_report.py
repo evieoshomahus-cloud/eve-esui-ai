@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import re
+import struct
 import zipfile
 from pathlib import Path
 
@@ -21,6 +22,10 @@ CHAPTER_FILES = [
     DOCS / "chapter_five_draft.md",
     DOCS / "references_2020_forward.md",
 ]
+
+DOCX_IMAGES: list[dict[str, object]] = []
+MAX_DOCX_IMAGE_WIDTH = 5_800_000
+MAX_DOCX_IMAGE_HEIGHT = 4_600_000
 
 
 def front_matter() -> str:
@@ -90,7 +95,7 @@ I acknowledge God Almighty for wisdom, strength, and protection throughout this 
 
 # ABSTRACT
 
-This project focused on the design and implementation of an AI system for personalized learning and academic progress tracking. The system, named Eve, was developed as a role-aware academic companion for Edo State University Iyamho. It supports guest users, students, and lecturers through a responsive Flutter interface connected to a Python FastAPI backend. The system provides admission guidance, student learning progress tracking, guided learning sessions, quiz scoring, saved progress history, lecturer assigned-course analytics, Retrieval-Augmented Generation, prompt-injection guardrails, and optional OpenAI response generation. SQLite was used to persist learning sessions, answers, scores, feedback, and completion status. The system was evaluated using backend compilation, Flutter analysis, widget tests, API endpoint tests, learning-session persistence checks, lecturer analytics checks, and security behavior tests. The results showed that Eve can support personalized academic guidance, track student progress over time, and provide lecturers with course-level learning evidence while enforcing role-based privacy controls.
+This project focused on the design and implementation of an AI system for personalized learning and academic progress tracking. The system, named Eve, was developed as a role-aware academic companion for Edo State University Iyamho. It supports guest users, students, and lecturers through a responsive Flutter interface connected to a Python FastAPI backend. The system provides admission guidance, student learning progress tracking, guided learning sessions, quiz scoring, saved progress history, upload-assisted questions, moderated peer notes, lecturer assigned-course analytics, Retrieval-Augmented Generation, prompt-injection guardrails, knowledge governance, and optional OpenAI response generation. SQLite was used to persist learning sessions, answers, scores, feedback, completion status, and peer-note review records. The system was evaluated using backend compilation, Flutter analysis, widget tests, API endpoint tests, learning-session persistence checks, lecturer analytics checks, moderation checks, and security behavior tests. The results showed that Eve can support personalized academic guidance, track student progress over time, manage reviewed student contributions, and provide lecturers with course-level learning evidence while enforcing role-based privacy controls.
 
 # TABLE OF CONTENTS
 
@@ -100,21 +105,27 @@ Use Microsoft Word to update the automatic table of contents after final formatt
 
 Figure 4.1 Entry screen
 
-Figure 4.2 Student home screen
+Figure 4.2 Personalized student dashboard
 
-Figure 4.3 Chat interface
+Figure 4.3 Mobile responsive dashboard
 
-Figure 4.4 Student learning progress dashboard
+Figure 4.4 Ask Eve conversation
 
-Figure 4.5 Guided learning session screen
+Figure 4.5 Upload-assisted Ask Eve
 
-Figure 4.6 Feedback history screen
+Figure 4.6 Guided learning session
 
-Figure 4.7 Lecturer teaching workbench
+Figure 4.7 Peer-note submission
 
-Figure 4.8 Admission readiness estimator
+Figure 4.8 Lecturer peer-note review
 
-Figure 4.9 Profile/account switcher
+Figure 4.9 Lecturer analytics
+
+Figure 4.10 Admission readiness estimator
+
+Figure 4.11 Admin knowledge library
+
+Figure 4.12 Backend health endpoint
 """
 
 
@@ -129,6 +140,10 @@ def assemble_markdown() -> str:
 
 def esc(text: str) -> str:
     return html.escape(text, quote=False)
+
+
+def esc_attr(text: str) -> str:
+    return html.escape(text, quote=True)
 
 
 def paragraph_xml(text: str, style: str = "Normal", bold: bool = False) -> str:
@@ -146,6 +161,97 @@ def paragraph_xml(text: str, style: str = "Normal", bold: bool = False) -> str:
         "</w:r>"
         "</w:p>"
     )
+
+
+def resolve_image_path(source: str) -> Path | None:
+    raw = source.strip().replace("\\", "/")
+    path = Path(raw)
+    candidates = [path] if path.is_absolute() else [DOCS / raw, ROOT / raw]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def image_dimensions(path: Path) -> tuple[int, int]:
+    suffix = path.suffix.lower()
+    data = path.read_bytes()
+    if suffix == ".png" and len(data) >= 24 and data[:8] == b"\x89PNG\r\n\x1a\n":
+        return struct.unpack(">II", data[16:24])
+    if suffix in {".jpg", ".jpeg"} and data[:2] == b"\xff\xd8":
+        index = 2
+        while index + 9 < len(data):
+            if data[index] != 0xFF:
+                index += 1
+                continue
+            marker = data[index + 1]
+            index += 2
+            if marker in {0xD8, 0xD9}:
+                continue
+            if index + 2 > len(data):
+                break
+            length = int.from_bytes(data[index:index + 2], "big")
+            if 0xC0 <= marker <= 0xCF and marker not in {0xC4, 0xC8, 0xCC}:
+                height = int.from_bytes(data[index + 3:index + 5], "big")
+                width = int.from_bytes(data[index + 5:index + 7], "big")
+                return width, height
+            index += length
+    return (1200, 800)
+
+
+def fitted_emu_size(path: Path) -> tuple[int, int]:
+    width, height = image_dimensions(path)
+    scale = min(MAX_DOCX_IMAGE_WIDTH / width, MAX_DOCX_IMAGE_HEIGHT / height)
+    return int(width * scale), int(height * scale)
+
+
+def image_paragraph_xml(source: str, caption: str) -> str:
+    path = resolve_image_path(source)
+    if path is None:
+        return paragraph_xml(f"[Missing screenshot: {source}]")
+
+    image_index = len(DOCX_IMAGES) + 1
+    rel_id = f"rIdImage{image_index}"
+    target_name = f"image{image_index}{path.suffix.lower()}"
+    cx, cy = fitted_emu_size(path)
+    DOCX_IMAGES.append({"rel_id": rel_id, "target": target_name, "path": path})
+
+    return f"""
+<w:p>
+  <w:r>
+    <w:drawing>
+      <wp:inline distT="0" distB="0" distL="0" distR="0">
+        <wp:extent cx="{cx}" cy="{cy}"/>
+        <wp:effectExtent l="0" t="0" r="0" b="0"/>
+        <wp:docPr id="{image_index}" name="Figure {image_index}" descr="{esc_attr(caption)}"/>
+        <wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr>
+        <a:graphic>
+          <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+            <pic:pic>
+              <pic:nvPicPr>
+                <pic:cNvPr id="0" name="{esc_attr(target_name)}"/>
+                <pic:cNvPicPr/>
+              </pic:nvPicPr>
+              <pic:blipFill>
+                <a:blip r:embed="{rel_id}"/>
+                <a:stretch><a:fillRect/></a:stretch>
+              </pic:blipFill>
+              <pic:spPr>
+                <a:xfrm>
+                  <a:off x="0" y="0"/>
+                  <a:ext cx="{cx}" cy="{cy}"/>
+                </a:xfrm>
+                <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+              </pic:spPr>
+            </pic:pic>
+          </a:graphicData>
+        </a:graphic>
+      </wp:inline>
+    </w:drawing>
+  </w:r>
+</w:p>
+{paragraph_xml(caption, bold=True)}
+"""
 
 
 def table_line_xml(line: str) -> str:
@@ -192,6 +298,11 @@ def markdown_to_body(markdown: str) -> str:
             flush_table()
             in_code = not in_code
             continue
+        image_match = re.fullmatch(r"!\[(.*?)\]\((.*?)\)", line.strip())
+        if image_match and not in_code:
+            flush_table()
+            body.append(image_paragraph_xml(image_match.group(2), image_match.group(1)))
+            continue
         if in_code:
             body.append(paragraph_xml(line, "Code"))
             continue
@@ -227,6 +338,9 @@ def content_types_xml() -> str:
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Default Extension="jpg" ContentType="image/jpeg"/>
+  <Default Extension="jpeg" ContentType="image/jpeg"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 </Types>"""
@@ -240,8 +354,14 @@ def rels_xml() -> str:
 
 
 def document_rels_xml() -> str:
-    return """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>"""
+    image_rels = "\n".join(
+        f'  <Relationship Id="{item["rel_id"]}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/{item["target"]}"/>'
+        for item in DOCX_IMAGES
+    )
+    return f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+{image_rels}
+</Relationships>"""
 
 
 def styles_xml() -> str:
@@ -276,7 +396,11 @@ def styles_xml() -> str:
 
 def document_xml(body_xml: str) -> str:
     return f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
     {body_xml}
     <w:sectPr>
@@ -288,6 +412,7 @@ def document_xml(body_xml: str) -> str:
 
 
 def build_docx(markdown: str) -> None:
+    DOCX_IMAGES.clear()
     body_xml = markdown_to_body(markdown)
     with zipfile.ZipFile(DOCX_OUTPUT, "w", zipfile.ZIP_DEFLATED) as docx:
         docx.writestr("[Content_Types].xml", content_types_xml())
@@ -295,6 +420,11 @@ def build_docx(markdown: str) -> None:
         docx.writestr("word/_rels/document.xml.rels", document_rels_xml())
         docx.writestr("word/styles.xml", styles_xml())
         docx.writestr("word/document.xml", document_xml(body_xml))
+        for item in DOCX_IMAGES:
+            path = item["path"]
+            target = item["target"]
+            if isinstance(path, Path) and isinstance(target, str):
+                docx.writestr(f"word/media/{target}", path.read_bytes())
 
 
 def main() -> None:
