@@ -8,3 +8,4 @@ storage/
 ngrok-temp-random.yml
 *.log
 *.tmp
+~$*.docx

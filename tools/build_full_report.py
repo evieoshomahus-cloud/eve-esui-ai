@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import html
+import os
 import re
 import struct
 import zipfile
@@ -11,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "project_docs"
 MARKDOWN_OUTPUT = DOCS / "full_project_report_draft.md"
-DOCX_OUTPUT = DOCS / "Eve_Full_Project_Report_Draft.docx"
+DOCX_OUTPUT = Path(os.environ.get("EVE_REPORT_OUTPUT", DOCS / "Eve_Full_Project_Report_Draft.docx"))
 TEMPLATE_DOCX = ROOT / "PROJECT TEMPLATE THE EXTRACTED VERSION (1).docx"
 
 TOPIC = "Design and implementation of an ai system for personalized learning and academic progress tracking"
@@ -280,6 +281,7 @@ def table_line_xml(line: str) -> str:
 def markdown_to_body(markdown: str) -> str:
     body: list[str] = []
     in_code = False
+    code_language = ""
     in_table = False
     table_rows: list[str] = []
 
@@ -306,7 +308,12 @@ def markdown_to_body(markdown: str) -> str:
         line = raw_line.rstrip()
         if line.startswith("```"):
             flush_table()
-            in_code = not in_code
+            if in_code:
+                in_code = False
+                code_language = ""
+            else:
+                in_code = True
+                code_language = line.strip("`").strip().lower()
             continue
         image_match = re.fullmatch(r"!\[(.*?)\]\((.*?)\)", line.strip())
         if image_match and not in_code:
@@ -314,6 +321,8 @@ def markdown_to_body(markdown: str) -> str:
             body.append(image_paragraph_xml(image_match.group(2), image_match.group(1)))
             continue
         if in_code:
+            if code_language == "mermaid":
+                continue
             body.append(paragraph_xml(line, "Code"))
             continue
         if line.startswith("|") and line.endswith("|"):
