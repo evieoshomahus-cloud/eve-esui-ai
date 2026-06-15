@@ -196,7 +196,37 @@ function New-DatabaseErd {
     Save-Diagram $bmp $g "database_erd.png"
 }
 
+function New-DetailedEveArchitecture {
+    $items = New-Canvas "Detailed Architecture of the Proposed Eve AI System"
+    $bmp = $items[0]
+    $g = $items[1]
+
+    $layers = @(
+        @(140, 125, 1320, 70, "USER ROLES: Guest | Student | Lecturer | Administrator", "#eaf2ff", "#173f8a"),
+        @(140, 225, 1320, 85, "FLUTTER WEB / MOBILE FRONTEND`nLogin, Ask Eve chat, student dashboard, lecturer analytics, admin knowledge tools", "#ecfdf3", "#027a48"),
+        @(140, 345, 1320, 80, "FASTAPI BACKEND SERVER`nReceives requests, coordinates system actions, connects frontend to AI and data services", "#f5f7fb", "#173f8a"),
+        @(140, 460, 1320, 80, "SECURITY AND ROLE-BASED ACCESS CONTROL`nChecks user role, blocks unauthorized access, detects prompt-injection attempts", "#fff9db", "#b89400"),
+        @(140, 575, 1320, 80, "AI PROCESSING LAYER`nIntent detection, Retrieval-Augmented Generation, OpenAI mode, local fallback logic", "#f4f0ff", "#6941c6"),
+        @(140, 690, 1320, 80, "ACADEMIC AND KNOWLEDGE SERVICES`nPersonalized learning, progress tracking, guided sessions, lecturer analytics, peer-note review", "#eef4ff", "#175cd3"),
+        @(140, 805, 1320, 60, "DATA STORAGE: Controlled ESUI knowledge base | Sample records | SQLite progress database | Peer-note records", "#fef2f2", "#b42318")
+    )
+
+    foreach ($layer in $layers) {
+        Draw-Box $g $layer[0] $layer[1] $layer[2] $layer[3] $layer[4] $layer[5] $layer[6] 15
+    }
+
+    for ($i = 0; $i -lt $layers.Length - 1; $i++) {
+        $x = 800
+        $y1 = $layers[$i][1] + $layers[$i][3]
+        $y2 = $layers[$i + 1][1]
+        Draw-Arrow $g $x ($y1 + 5) $x ($y2 - 5) "#173f8a"
+    }
+
+    Save-Diagram $bmp $g "proposed_eve_system_architecture_detailed.png"
+}
+
 New-ExistingArchitecture
 New-ProposedArchitecture
 New-DataFlowDiagram
 New-DatabaseErd
+New-DetailedEveArchitecture
