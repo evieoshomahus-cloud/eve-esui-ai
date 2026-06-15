@@ -72,6 +72,14 @@ Use Microsoft Word to update the automatic table of contents after final formatt
 
 # LIST OF FIGURES
 
+Figure 3.1 Architecture of the existing system
+
+Figure 3.2 Architecture of the proposed Eve system
+
+Figure 3.3 Data flow diagram
+
+Figure 3.4 Database and storage design
+
 Figure 4.1 Entry screen
 
 Figure 4.2 Personalized student dashboard
@@ -386,6 +394,8 @@ For prospective candidates, admission information may be available online, but c
 
 Generic AI tools can answer questions, but they are not designed around Edo State University data, student privacy, lecturer authorization, or academic progress tracking. They may hallucinate policies, expose private information, or fail to ground responses in approved institutional knowledge.
 
+![Figure 3.1: Architecture of the existing system showing scattered academic information sources.](diagrams/existing_system_architecture.png)
+
 ## 3.4 Proposed System Overview
 
 The proposed system, Eve, is an AI-powered academic support platform for Edo State University Iyamho. It provides personalized learning and academic progress tracking through three major user modes:
@@ -514,6 +524,8 @@ flowchart LR
     API --> Flutter
 ```
 
+![Figure 3.2: Architecture of the proposed Eve system.](diagrams/proposed_system_architecture.png)
+
 ### 3.8.1 Backend Layer
 
 The backend is implemented with FastAPI. It exposes REST endpoints for users, chat, admissions estimation, student learning profile, learning sessions, progress history, lecturer insights, file-assisted questions, peer-note submission, and moderation review.
@@ -590,6 +602,8 @@ flowchart LR
     Response --> Client
     Client --> User
 ```
+
+![Figure 3.3: Data flow diagram for Eve.](diagrams/data_flow_diagram.png)
 
 ### 3.9.3 Learning Session Sequence
 
@@ -670,6 +684,8 @@ erDiagram
         text created_at
     }
 ```
+
+![Figure 3.4: Database and storage design for progress tracking and peer-note moderation.](diagrams/database_erd.png)
 
 ### 3.10.2 Table Description
 

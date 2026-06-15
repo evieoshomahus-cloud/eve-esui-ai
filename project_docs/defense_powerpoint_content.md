@@ -75,19 +75,11 @@ Objectives:
 
 ## Slide 8: Architecture of the Existing System
 
-Existing flow:
+The architecture diagram shows the current scattered support process:
 
-- Student or candidate asks office, website, lecturer, or peers.
-- Information is manually searched or requested.
-- Progress tracking depends on isolated scores and manual interpretation.
-- Lecturer intervention depends on delayed or fragmented data.
-
-Weaknesses:
-
-- slow feedback;
-- scattered data;
-- limited personalization;
-- privacy risk if informal channels are used.
+- Student or candidate moves between the university website, student portal, physical offices, lecturers, course materials, peers, and notice boards.
+- Information is manually searched or repeatedly requested.
+- The major weaknesses are delayed feedback, limited personalization, and no continuous academic progress tracking.
 
 ## Slide 9: Analysis of the Proposed System
 
@@ -112,26 +104,11 @@ Proposed system: Eve.
 
 ## Slide 11: Architecture of the Proposed System
 
-Main architecture:
+The proposed architecture diagram shows:
 
-- Flutter Web/Mobile Client
-- FastAPI Backend
-- Guardrail Layer
-- Role-Based Access Layer
-- RAG Retrieval Layer
-- Academic Services
-- SQLite Progress Database
-- Optional OpenAI Responses API
-
-Suggested diagram:
-
-```text
-User -> Flutter Client -> FastAPI Backend
-                 -> Guardrails -> Role Access
-                 -> RAG -> ESUI Knowledge Base
-                 -> Academic Services -> SQLite
-                 -> Optional OpenAI API
-```
+- Guest, student, and lecturer users entering through the Flutter client.
+- The Flutter client communicating with the FastAPI backend.
+- The backend connecting guardrails, role-based access control, RAG, curated ESUI knowledge, academic services, SQLite progress storage, peer-note review, and optional OpenAI response generation.
 
 ## Slide 12: System Requirements
 
@@ -152,23 +129,9 @@ Software:
 
 ## Slide 13: Diagrams of the System
 
-Recommended diagrams for defense:
-
-- Use Case Diagram.
-- Data Flow Diagram.
-- Entity Relationship Diagram.
-- Learning Session Sequence Diagram.
-
-Key entities:
-
-- `learning_sessions`
-- `learning_answers`
-
-Key actors:
-
-- Guest
-- Student
-- Lecturer
+- The data-flow diagram shows how a user request moves from the Flutter client to the API, guardrails, retrieval layer, academic services, and back as a grounded Eve response.
+- The database/storage diagram shows `learning_sessions`, `learning_answers`, `peer_notes`, and `peer_note_reviews`.
+- The use case, sequence, and detailed ERD are documented in Chapter Three.
 
 ## Slide 14: Overview of Implementation
 

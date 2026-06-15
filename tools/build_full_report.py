@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import html
 import re
 import struct
@@ -11,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "project_docs"
 MARKDOWN_OUTPUT = DOCS / "full_project_report_draft.md"
 DOCX_OUTPUT = DOCS / "Eve_Full_Project_Report_Draft.docx"
+TEMPLATE_DOCX = ROOT / "PROJECT TEMPLATE THE EXTRACTED VERSION (1).docx"
 
 TOPIC = "Design and implementation of an ai system for personalized learning and academic progress tracking"
 
@@ -102,6 +104,14 @@ This project focused on the design and implementation of an AI system for person
 Use Microsoft Word to update the automatic table of contents after final formatting.
 
 # LIST OF FIGURES
+
+Figure 3.1 Architecture of the existing system
+
+Figure 3.2 Architecture of the proposed Eve system
+
+Figure 3.3 Data flow diagram
+
+Figure 3.4 Database and storage design
 
 Figure 4.1 Entry screen
 
@@ -211,8 +221,8 @@ def image_paragraph_xml(source: str, caption: str) -> str:
         return paragraph_xml(f"[Missing screenshot: {source}]")
 
     image_index = len(DOCX_IMAGES) + 1
-    rel_id = f"rIdImage{image_index}"
-    target_name = f"image{image_index}{path.suffix.lower()}"
+    rel_id = f"rIdEveImage{image_index}"
+    target_name = f"eve_report_image{image_index}{path.suffix.lower()}"
     cx, cy = fitted_emu_size(path)
     DOCX_IMAGES.append({"rel_id": rel_id, "target": target_name, "path": path})
 
@@ -411,9 +421,75 @@ def document_xml(body_xml: str) -> str:
 </w:document>"""
 
 
+def add_image_content_types(content_xml: str) -> str:
+    additions = []
+    defaults = {
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+    }
+    for extension, content_type in defaults.items():
+        if f'Extension="{extension}"' not in content_xml:
+            additions.append(f'  <Default Extension="{extension}" ContentType="{content_type}"/>')
+    if not additions:
+        return content_xml
+    return content_xml.replace("</Types>", "\n".join(additions) + "\n</Types>")
+
+
+def document_rels_from_template(rels_xml_text: str) -> str:
+    image_rels = "\n".join(
+        f'  <Relationship Id="{item["rel_id"]}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/{item["target"]}"/>'
+        for item in DOCX_IMAGES
+    )
+    if not image_rels:
+        return rels_xml_text
+    return rels_xml_text.replace("</Relationships>", image_rels + "\n</Relationships>")
+
+
+def document_xml_from_template(template_xml: str, body_xml: str) -> str:
+    body_start = template_xml.find("<w:body>")
+    body_end = template_xml.rfind("</w:body>")
+    if body_start == -1 or body_end == -1:
+        return document_xml(body_xml)
+
+    body_content_start = body_start + len("<w:body>")
+    existing_body = template_xml[body_content_start:body_end]
+    sect_start = existing_body.rfind("<w:sectPr")
+    sect_pr = ""
+    if sect_start != -1:
+        sect_pr = existing_body[sect_start:]
+
+    return template_xml[:body_content_start] + "\n" + body_xml + "\n" + sect_pr + "\n" + template_xml[body_end:]
+
+
+def copy_zip_info(item: zipfile.ZipInfo) -> zipfile.ZipInfo:
+    return copy.copy(item)
+
+
 def build_docx(markdown: str) -> None:
     DOCX_IMAGES.clear()
     body_xml = markdown_to_body(markdown)
+    if TEMPLATE_DOCX.exists():
+        with zipfile.ZipFile(TEMPLATE_DOCX, "r") as source, zipfile.ZipFile(DOCX_OUTPUT, "w", zipfile.ZIP_DEFLATED) as docx:
+            for item in source.infolist():
+                data = source.read(item.filename)
+                if item.filename == "[Content_Types].xml":
+                    text = data.decode("utf-8")
+                    data = add_image_content_types(text).encode("utf-8")
+                elif item.filename == "word/document.xml":
+                    text = data.decode("utf-8")
+                    data = document_xml_from_template(text, body_xml).encode("utf-8")
+                elif item.filename == "word/_rels/document.xml.rels":
+                    text = data.decode("utf-8")
+                    data = document_rels_from_template(text).encode("utf-8")
+                docx.writestr(copy_zip_info(item), data)
+            for item in DOCX_IMAGES:
+                path = item["path"]
+                target = item["target"]
+                if isinstance(path, Path) and isinstance(target, str):
+                    docx.writestr(f"word/media/{target}", path.read_bytes())
+        return
+
     with zipfile.ZipFile(DOCX_OUTPUT, "w", zipfile.ZIP_DEFLATED) as docx:
         docx.writestr("[Content_Types].xml", content_types_xml())
         docx.writestr("_rels/.rels", rels_xml())

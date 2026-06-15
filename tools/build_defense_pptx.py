@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "UNDERGRADUATE POWERPOINT TEMPLATE (2).pptx"
 OUTPUT = ROOT / "project_docs" / "Eve_Defense_Presentation.pptx"
 SCREENSHOTS = ROOT / "project_docs" / "screenshots"
+DIAGRAMS = ROOT / "project_docs" / "diagrams"
 
 P_NS = "http://schemas.openxmlformats.org/presentationml/2006/main"
 A_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
@@ -27,6 +28,40 @@ CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types
 RELS_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 SLIDE_IMAGES = {
+    8: [
+        {
+            "source": DIAGRAMS / "existing_system_architecture.png",
+            "media": "eve_slide8_existing_architecture.png",
+            "rel_id": "rIdEveExistingArchitecture",
+            "name": "Architecture of the existing system",
+            "box": (5200000, 1750000, 6500000, 3900000),
+        }
+    ],
+    11: [
+        {
+            "source": DIAGRAMS / "proposed_system_architecture.png",
+            "media": "eve_slide11_proposed_architecture.png",
+            "rel_id": "rIdEveProposedArchitecture",
+            "name": "Architecture of the proposed Eve system",
+            "box": (5200000, 1750000, 6500000, 3900000),
+        }
+    ],
+    13: [
+        {
+            "source": DIAGRAMS / "data_flow_diagram.png",
+            "media": "eve_slide13_data_flow.png",
+            "rel_id": "rIdEveDataFlow",
+            "name": "Eve data flow diagram",
+            "box": (5100000, 1500000, 6600000, 2200000),
+        },
+        {
+            "source": DIAGRAMS / "database_erd.png",
+            "media": "eve_slide13_database_erd.png",
+            "rel_id": "rIdEveDatabaseErd",
+            "name": "Eve database and storage design",
+            "box": (5100000, 4050000, 6600000, 2200000),
+        },
+    ],
     17: [
         {
             "source": SCREENSHOTS / "student_personalized_home_desktop.png",
@@ -140,11 +175,9 @@ SLIDE_BODIES = {
         "Generic AI tools lack ESUI-specific governance and privacy controls.",
     ],
     8: [
-        "Student or candidate asks office, website, lecturer, or peers.",
-        "Information is manually searched or requested.",
-        "Progress tracking depends on isolated scores and manual interpretation.",
-        "Lecturer intervention depends on delayed or fragmented data.",
-        "Weaknesses: slow feedback, scattered data, limited personalization, privacy risk.",
+        "Information is scattered across website, portal, offices, lecturers, course materials, and peers.",
+        "The student must manually search across several sources.",
+        "There is limited personalization, delayed feedback, and no continuous progress tracking.",
     ],
     9: [
         "Proposed system: Eve.",
@@ -165,12 +198,9 @@ SLIDE_BODIES = {
         "Testing through API checks, Flutter analysis, widget tests, and security scenarios.",
     ],
     11: [
-        "User -> Flutter Client -> FastAPI Backend.",
-        "Backend -> Guardrails -> Role-Based Access.",
-        "Backend -> RAG -> ESUI Knowledge Base.",
-        "Academic services -> SQLite progress database.",
-        "Optional OpenAI Responses API improves response naturalness.",
-        "Local fallback keeps the system usable without OpenAI mode.",
+        "Flutter connects guest, student, and lecturer users to a FastAPI backend.",
+        "Guardrails and role-based access control protect private academic data.",
+        "RAG, academic services, SQLite, peer-note review, and OpenAI mode work together.",
     ],
     12: [
         "Hardware: laptop or desktop computer with internet for OpenAI mode.",
@@ -180,11 +210,9 @@ SLIDE_BODIES = {
         "API key is stored privately in .env and never hard-coded.",
     ],
     13: [
-        "Use Case Diagram: Guest, Student, Lecturer, Eve AI System.",
-        "Data Flow Diagram: Flutter client, API, guardrails, RAG, academic services, SQLite.",
-        "ERD: learning_sessions and learning_answers.",
-        "Sequence Diagram: start session, submit answer, score answer, save progress.",
-        "These diagrams are documented in Chapter Three.",
+        "Data flow shows how a request becomes a grounded Eve response.",
+        "Storage design separates learning progress from moderated peer-note review.",
+        "Use case, sequence, and ERD details are documented in Chapter Three.",
     ],
     14: [
         "Entry and role selection screen.",
@@ -343,11 +371,19 @@ def add_textbox(root: ET.Element, slide_index: int, lines: list[str]) -> None:
     sp_pr = ET.SubElement(sp, qn(P_NS, "spPr"))
     xfrm = ET.SubElement(sp_pr, qn(A_NS, "xfrm"))
     off = ET.SubElement(xfrm, qn(A_NS, "off"))
-    off.set("x", "760000")
-    off.set("y", "1250000" if slide_index == 17 else ("1480000" if slide_index != 1 else "2100000"))
+    if slide_index in {8, 11, 13}:
+        off.set("x", "650000")
+        off.set("y", "1700000")
+    else:
+        off.set("x", "760000")
+        off.set("y", "1250000" if slide_index == 17 else ("1480000" if slide_index != 1 else "2100000"))
     ext = ET.SubElement(xfrm, qn(A_NS, "ext"))
-    ext.set("cx", "11380000")
-    ext.set("cy", "500000" if slide_index == 17 else ("5000000" if slide_index != 1 else "3300000"))
+    if slide_index in {8, 11, 13}:
+        ext.set("cx", "4000000")
+        ext.set("cy", "4300000")
+    else:
+        ext.set("cx", "11380000")
+        ext.set("cy", "500000" if slide_index == 17 else ("5000000" if slide_index != 1 else "3300000"))
     prst = ET.SubElement(sp_pr, qn(A_NS, "prstGeom"))
     prst.set("prst", "rect")
     ET.SubElement(prst, qn(A_NS, "avLst"))
@@ -362,7 +398,10 @@ def add_textbox(root: ET.Element, slide_index: int, lines: list[str]) -> None:
     ET.SubElement(tx_body, qn(A_NS, "lstStyle"))
     for line in lines:
         add_line = line if slide_index == 21 else f"- {line}"
-        font_size = 1450 if slide_index == 17 else (2100 if slide_index != 20 else 1750)
+        if slide_index in {8, 11, 13}:
+            font_size = 1550
+        else:
+            font_size = 1450 if slide_index == 17 else (2100 if slide_index != 20 else 1750)
         tx_body.append(paragraph(add_line, font_size))
 
     sp_tree.append(sp)
